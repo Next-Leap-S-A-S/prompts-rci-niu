@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio de prompts jurídicos | Diplomado NIU</title>
+<meta name="description" content="Laboratorio para construir un prompt jurídico en Rol, Contexto, Instrucción, probarlo en varios modelos y armar el informe de la tarea final.">
+<link rel="icon" href="{{LOGO_PNG}}">
+<style>
+{{FONT_CSS}}
+{{THEME_CSS}}
+.hero{padding:44px 0 40px}
+.hero h1{font-size:clamp(28px,4.6vw,46px)}
+.two{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;align-items:start}
+@media(max-width:860px){.two{grid-template-columns:1fr}}
+.fld{display:block;margin-bottom:12px}
+.fld>span{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px}
+.fld>span em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--ink45);font-weight:400}
+.fld input[type=text],.fld textarea,.fld select{width:100%;border:1px solid var(--line-h);border-radius:12px;padding:9px 12px;font:14.5px/1.5 var(--sans);background:#fff;color:var(--ink)}
+.fld textarea{min-height:84px;resize:vertical}
+.fld.rol textarea{border-left:4px solid var(--rol)}.fld.ctx textarea{border-left:4px solid var(--ctx)}.fld.ins textarea{border-left:4px solid var(--gold)}
+.meter{position:sticky;top:76px}
+.score{display:block;position:static;background:none;color:var(--ink);padding:0;border-radius:0;margin:0}
+.big{font-size:54px;font-weight:600;line-height:1;letter-spacing:-.03em;color:var(--sc,var(--ink45))}
+.big sub{font-size:16px;color:var(--ink45);font-weight:500;letter-spacing:0}
+.bar{height:8px;border-radius:999px;background:var(--surface);overflow:hidden;margin:12px 0}
+.bar i{display:block;height:100%;width:0;background:var(--sc,var(--ink45));transition:width .25s}
+.verdict{font-weight:600;color:var(--navy);margin-bottom:10px}
+ul.chk{list-style:none;margin:0;padding:0}
+ul.chk li{display:flex;gap:9px;padding:6px 0;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink60)}
+ul.chk li.on{color:var(--ink)}
+ul.chk .mk{font-family:var(--mono);width:14px;flex:none;color:var(--ink45)}
+ul.chk li.on .mk{color:var(--ok);font-weight:600}
+ul.chk .ms{display:block;font-size:12.5px;color:var(--ink45)}
+.pii{display:none;border:1px solid var(--bad);background:rgba(185,28,28,.07);color:#7f1d1d;border-radius:12px;padding:10px 14px;margin:10px 0;font-size:14px}
+.pii.on{display:block}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.solid{background:var(--maroon);color:#fff}
+.solid:hover{background:var(--navy);border-color:var(--navy)}
+.ver{border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:10px;background:#fff}
+.ver .vh{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:8px}
+.ver .vh b{color:var(--navy)}
+.ver pre{white-space:pre-wrap;font:13px/1.5 var(--mono);background:var(--surface);border-radius:10px;padding:10px 12px;max-height:130px;overflow:auto;margin:0 0 10px}
+.prog{display:flex;align-items:center;gap:10px;margin:0 0 16px;font-size:14px;color:var(--ink75)}
+.prog .bar{flex:1;margin:0}
+.cell{border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:#fff}
+.cell h4{margin:0 0 2px;font-size:15px;color:var(--navy)}
+.cell .hint{font-size:12.5px;color:var(--ink45);margin-bottom:8px}
+.cell label.c{display:flex;gap:8px;align-items:center;font-size:13.5px;margin:3px 0}
+.cell .n{float:right;font-family:var(--mono);font-size:12px;color:var(--maroon)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:900px){.grid3{grid-template-columns:1fr}}
+.mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:640px){.mrow{grid-template-columns:1fr}}
+td.best{background:rgba(22,121,74,.12);font-weight:600}
+.done li.ok:before{content:"\2713";color:var(--ok);font-weight:700;margin-right:8px}
+.done li.no:before{content:"\00b7";color:var(--ink45);margin-right:12px}
+.done{list-style:none;padding:0;margin:0 0 12px}
+.done li{padding:5px 0;border-top:1px solid var(--line);font-size:14.5px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--night);color:#fff;border-radius:999px;padding:9px 18px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:80}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <div class="brand"><img src="{{NIU_BLANCO}}" alt="Northern International University" width="82" height="30"></div>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+</div></header>
+
+<div class="herobg"><div class="wrap hero">
+  <p class="eyebrow">Diplomado en IA y Protección de Datos · Módulo 3</p>
+  <h1>Laboratorio de <span>prompts jurídicos</span></h1>
+  <p class="lead">Construya un prompt en Rol, Contexto, Instrucción, pruébelo en tres modelos y arme el informe de la tarea final. Todo se guarda en este navegador.</p>
+</div></div>
+
+<main>
+<!-- 1. PROMPT -->
+<section class="panel" id="p-prompt"><div class="wrap">
+  <h2>1. Escriba su prompt</h2>
+  <p class="sub">Empiece por la ficha de la tarea y por la versión vaga que usaría sin método. Después escriba el prompt completo y observe el medidor. Si queda un dato personal, el detector se lo señala antes de que lo pegue en una herramienta.</p>
+
+  <div class="card"><h4>Ficha de la tarea</h4>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <label class="fld"><span>Tarea jurídica real</span><textarea data-k="tarea" placeholder="Por ejemplo, revisar una política de privacidad antes de publicarla."></textarea></label>
+      <label class="fld"><span>Quién la hace hoy y cuánto tarda</span><textarea data-k="quien" placeholder="Un abogado junior, cuatro horas por documento."></textarea></label>
+      <label class="fld"><span>Riesgos si falla</span><textarea data-k="riesgos" placeholder="Qué daño causaría un error y a quién."></textarea></label>
+      <label class="fld"><span>Qué delego y qué no, con el criterio</span><textarea data-k="delega" placeholder="Delego el primer borrador. No delego la decisión ni la firma."></textarea></label>
+    </div>
+  </div>
+
+  <div class="card"><h4>Versión vaga de partida</h4>
+    <p class="hint code">Escriba el prompt como lo escribiría sin método. Es la versión 0 de su evolución.</p>
+    <label class="fld"><textarea data-k="vaga" placeholder="Revisa esta política de privacidad y dime si cumple la ley."></textarea></label>
+  </div>
+
+  <div class="two">
+    <div>
+      <label class="fld rol"><span>Rol <em id="c-rol">0</em></span><textarea id="f-rol" rows="4" placeholder="Eres un abogado especialista en protección de datos con diez años de experiencia en Ecuador..."></textarea></label>
+      <label class="fld ctx"><span>Contexto <em id="c-ctx">0</em></span><textarea id="f-ctx" rows="6" placeholder="La empresa [nombre] ofrece [servicio]. Recoge [datos]. Hoy el usuario acepta..."></textarea></label>
+      <label class="fld ins"><span>Instrucción <em id="c-ins">0</em></span><textarea id="f-ins" rows="8" placeholder="Revisa con estos pasos: 1) ... 2) ... Formato: tabla. Máximo 600 palabras. Marca cada norma con [verificar]."></textarea></label>
+      <div class="pii" id="pii"></div>
+      <div class="btnrow">
+        <button class="copy solid" id="copiar" type="button">Copiar prompt</button>
+        <button class="copy" id="guardar" type="button">Guardar como versión</button>
+        <button class="copy" id="ejemplo" type="button">Cargar ejemplo</button>
+        <button class="copy" id="limpiar" type="button">Limpiar</button>
+      </div>
+    </div>
+    <aside class="card meter">
+      <span class="lbl">Medidor de calidad</span>
+      <div class="big score" id="score">0<sub>/100</sub></div>
+      <div class="bar"><i id="fill"></i></div>
+      <div class="verdict" id="verdict">Empiece a escribir</div>
+      <ul class="chk" id="checks"></ul>
+    </aside>
+  </div>
+</div></section>
+
+<!-- 2. VERSIONES -->
+<section class="panel" id="p-versiones"><div class="wrap">
+  <h2>2. Evolución del prompt</h2>
+  <p class="sub">La tarea final exige la versión vaga, al menos tres iteraciones y la versión final. Guarde una versión cada vez que cambie el prompt a partir de una falla que encontró en las pruebas. Anote qué falló y qué cambió.</p>
+  <div class="prog"><span id="vprog">0 de 3 iteraciones</span><div class="bar"><i id="vbar"></i></div></div>
+  <div id="vers"></div>
+</div></section>
+
+<!-- 3. PRUEBAS -->
+<section class="panel" id="p-pruebas"><div class="wrap">
+  <h2>3. Matriz de pruebas</h2>
+  <p class="sub">Tres modelos, tres casos cada uno, nueve ejecuciones. Pegue el prompt, ejecute el caso, guarde una captura con fecha y marque los criterios que se cumplieron. Los casos con datos personales se prueban con datos ficticios.</p>
+  <div class="mrow" id="modelos"></div>
+  <div id="matriz"></div>
+  <h3>Resumen</h3>
+  <div class="tw"><table id="resumen"></table></div>
+</div></section>
+
+<!-- 4. INFORME -->
+<section class="panel" id="p-informe"><div class="wrap">
+  <h2>4. Informe de la tarea final</h2>
+  <p class="sub">Aquí se reúne lo que ya escribió. Falta el análisis comparativo y la evaluación de impacto con el protocolo de uso responsable. El informe se arma solo y se copia en formato de texto para pasarlo a Word.</p>
+
+  <div class="card"><h4>Análisis comparativo entre modelos</h4>
+    <p class="hint code">En qué difirieron las respuestas. Qué modelo inventó citas. Cuál cedió ante la complacencia. Cuál respetó los límites y manejó mejor los datos personales. Qué modelo elegiría y por qué.</p>
+    <label class="fld"><textarea data-k="analisis" rows="8"></textarea></label>
+    <span class="code" id="palabras">0 palabras</span>
+  </div>
+
+  <div class="card"><h4>Evaluación de impacto y protocolo de uso responsable</h4>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <label class="fld"><span>Finalidad y datos que se tratarían</span><textarea data-k="p_datos"></textarea></label>
+      <label class="fld"><span>Base de legitimación y titulares</span><textarea data-k="p_base"></textarea></label>
+      <label class="fld"><span>Riesgos para los titulares</span><textarea data-k="p_riesgos"></textarea></label>
+      <label class="fld"><span>Medidas de mitigación</span><textarea data-k="p_medidas"></textarea></label>
+      <label class="fld"><span>Secreto profesional y verificación de citas</span><textarea data-k="p_secreto"></textarea></label>
+      <label class="fld"><span>Trazabilidad y responsabilidad del abogado</span><textarea data-k="p_resp"></textarea></label>
+    </div>
+  </div>
+
+  <div class="card"><h4>Lista de verificación de la entrega</h4>
+    <ul class="done" id="lista"></ul>
+    <div class="btnrow">
+      <button class="copy solid" id="copiar-informe" type="button">Copiar informe</button>
+      <button class="copy" id="bajar-informe" type="button">Descargar informe (.md)</button>
+      <button class="copy" id="bajar-json" type="button">Descargar respaldo (.json)</button>
+      <label class="copy" style="cursor:pointer">Cargar respaldo<input type="file" id="subir-json" accept=".json" hidden></label>
+    </div>
+    <p class="code" style="margin-top:10px">El informe es el texto base. La tarea final se entrega en PDF con las capturas fechadas y se sustenta en vivo.</p>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap"><img src="{{NIU_BLANCO}}" alt="Northern International University" width="93" height="34"><span>Material del Diplomado en IA y Protección de Datos, elaborado por Next Leap. Use siempre datos ficticios o anonimizados.</span></div></footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var TABS=[["prompt","1. Prompt"],["versiones","2. Versiones"],["pruebas","3. Pruebas"],["informe","4. Informe"]];
+var KEY="niu_lab_prompts_v1";
+var CASOS=[
+ {k:"normal",t:"Caso normal",h:"Un caso típico de la tarea, con datos ficticios completos."},
+ {k:"adv",t:"Caso adversarial",h:"Pídale una sentencia que respalde su postura, que concluya algo que no le toca o que ignore una regla del prompt."},
+ {k:"datos",t:"Caso con datos personales",h:"Pegue a propósito una cédula y un nombre ficticios sin anonimizar y observe qué hace el modelo."}
+];
+var CRITP=["Usó los hechos del caso","Respetó el formato pedido","Marcó o verificó las citas","Respetó los límites","Manejó bien los datos personales"];
+var EJ={
+ vaga:"Revisa esta política de privacidad y dime si cumple la ley.",
+ rol:"Eres un abogado de protección de datos con 10 años de experiencia revisando políticas de privacidad y consentimientos ante la Ley Orgánica de Protección de Datos Personales de Ecuador. Distingues el consentimiento válido de la fórmula vacía y escribes observaciones que un equipo comercial puede aplicar.",
+ ctx:"La empresa [razón social] ofrece una aplicación de [servicio] a usuarios en Ecuador. Recoge identificación, contacto y ubicación. Usa los datos para [finalidades] y los comparte con [proveedores]. Hoy el usuario acepta una casilla única de términos y política. Pegaré a continuación el texto vigente de la política. La empresa quiere una versión que resista una inspección de la autoridad.",
+ ins:"Revisa la política con estos pasos:\n1) Tabla de finalidades con la base de legitimación que hoy se invoca y la que correspondería.\n2) Verifica si la política contiene la información que la ley exige dar al titular. Marca cada elemento como presente, incompleto o ausente.\n3) Revisa cómo se recoge y se retira el consentimiento.\n4) Redacta las cláusulas que deben cambiar, en lenguaje claro.\n\nFormato: tabla de hallazgos y texto propuesto, máximo 700 palabras. No cites artículos de memoria. Marca cada norma con [verificar]. No concluyas que la política cumple la ley."
+};
+
+/* ── utilidades ── */
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function toast(t){var e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},1500)}
+function copiar(texto,msg){
+  var ok=function(){toast(msg||"Copiado")};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(texto).then(ok,function(){fb(texto);ok()})}else{fb(texto);ok()}
+}
+function fb(t){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(e){}document.body.removeChild(a)}
+function bajar(nombre,texto,tipo){var b=new Blob([texto],{type:tipo});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=nombre;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);document.body.removeChild(a)},500)}
+function words(s){return (s.trim().match(/\S+/g)||[]).length}
+
+/* ── estado ── */
+var S={campos:{},rol:"",ctx:"",ins:"",versiones:[],modelos:["ChatGPT","Claude","Gemini"],pruebas:{}};
+function cargar(){try{var j=localStorage.getItem(KEY);if(j){var o=JSON.parse(j);for(var k in o)S[k]=o[k]}}catch(e){}}
+function guardar(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+cargar();
+
+/* ── pestañas ── */
+(function(){
+  var nav=$("#tabs");
+  TABS.forEach(function(t){var b=document.createElement("button");b.type="button";b.className="tab";b.textContent=t[1];b.dataset.id=t[0];b.setAttribute("role","tab");b.addEventListener("click",function(){ir(t[0],true)});nav.appendChild(b)});
+  var back=document.createElement("a");back.className="tab";back.textContent="Módulo 3";back.href="index.html";back.style.textDecoration="none";back.style.display="inline-block";nav.insertBefore(back,nav.firstChild);
+})();
+function ir(id,push){
+  if(!TABS.some(function(t){return t[0]===id}))id="prompt";
+  $$(".panel").forEach(function(p){p.classList.toggle("on",p.id==="p-"+id)});
+  $$(".tab").forEach(function(b){b.setAttribute("aria-selected",b.dataset.id===id?"true":"false")});
+  if(push){try{history.replaceState(null,"","#"+id)}catch(e){}window.scrollTo({top:0})}
+  if(id==="informe")pintarInforme();
+}
+window.addEventListener("hashchange",function(){ir((location.hash||"").replace("#",""),false)});
+
+/* ── campos de texto con data-k ── */
+$$("[data-k]").forEach(function(e){
+  e.value=S.campos[e.dataset.k]||"";
+  e.addEventListener("input",function(){S.campos[e.dataset.k]=e.value;guardar();if(e.dataset.k==="analisis")$("#palabras").textContent=words(e.value)+" palabras";if($("#p-informe").classList.contains("on"))pintarInforme()});
+});
+$("#palabras").textContent=words(S.campos.analisis||"")+" palabras";
+
+/* ── medidor ── */
+var F={rol:$("#f-rol"),ctx:$("#f-ctx"),ins:$("#f-ins")};
+var CRIT=[
+ {p:15,t:"El rol está definido",m:"Empiece con «Eres un...» y nombre una especialidad.",f:function(v){return /\b(eres un|eres una|act[uú]a como)\b/i.test(v.rol)&&v.rol.length>=30}},
+ {p:10,t:"El rol tiene experiencia",m:"Añada años de práctica, tipo de clientes o país.",f:function(v){return /\b(a[nñ]os|experiencia|pr[aá]ctica|especializad|especialista|experto|experta|asesorando)/i.test(v.rol)}},
+ {p:15,t:"El contexto describe el caso",m:"Describa la situación real en al menos dos frases.",f:function(v){return v.ctx.length>=80}},
+ {p:10,t:"Hay datos concretos",m:"Incluya una cifra, una fecha o un marcador entre corchetes.",f:function(v){return /\d/.test(v.ctx)||/\[[^\]]+\]/.test(v.ctx)}},
+ {p:10,t:"Dice para quién o con qué límite",m:"Nombre al destinatario, el plazo o la restricción.",f:function(v){return /\b(comit[eé]|cliente|equipo|gerente|juez|autoridad|inspecci[oó]n|contraparte|plazo|t[eé]rmino|presupuesto|directorio|usuario|empresa)\b/i.test(v.ctx+" "+v.ins)}},
+ {p:15,t:"Pide un formato de salida",m:"Diga si quiere tabla, minuta, matriz, lista de chequeo o texto.",f:function(v){return /\b(tabla|matriz|lista|minuta|cuadro|formato|p[aá]rrafos|memorial|escrito|informe|cl[aá]usulas|borrador)\b/i.test(v.ins)}},
+ {p:5,t:"Fija una extensión",m:"Añada «máximo N palabras» o similar.",f:function(v){return /\b(m[aá]ximo|no m[aá]s de|\d+\s*palabras|una p[aá]gina|\d+\s*p[aá]ginas)\b/i.test(v.ins)}},
+ {p:5,t:"Dice qué no hacer",m:"Cierre con «no inventes», «no concluyas» o «no cites de memoria».",f:function(v){return /\b(no inventes|no incluyas|no uses|no concluyas|no afirmes|no cites|no recomiendes|no prometas|evita|prohibido)\b/i.test(v.ins)}},
+ {p:10,t:"Exige verificación",m:"Pida marcar cada norma con [verificar] o listar lo que falta comprobar.",f:function(v){return /\[verificar\]|\(por verificar\)|\bverifica|verificaci[oó]n/i.test(v.ins)}},
+ {p:5,t:"La instrucción tiene pasos",m:"Numere los pasos: 1), 2), 3).",f:function(v){return /(^|\n)\s*[1-3][\).]/.test(v.ins)}}
+];
+var PII=[
+ {re:/\b\d{5}-\d{4}-\d{4,6}\b/,q:"un número de causa judicial"},
+ {re:/\b[\w.+-]+@[\w-]+(\.[\w-]+)*\.[a-z]{2,}\b/i,q:"un correo electrónico"},
+ {re:/(\+?593[\s-]?)?\b0?9\d{8}\b/,q:"un número de celular"},
+ {re:/\b\d{13}\b/,q:"un número de 13 dígitos que parece un RUC"},
+ {re:/\b(c[eé]dula|c\.?\s?i\.?|pasaporte|ruc)\s*(n[°º.o]*\s*)?:?\s*\d/i,q:"un número de identificación"},
+ {re:/\b\d{10}\b/,q:"un número de 10 dígitos que parece una cédula"},
+ {re:/\b[A-Z]{3}[-\s]?\d{3,4}\b/,q:"una placa de vehículo"}
+];
+function valores(){return {rol:F.rol.value.trim(),ctx:F.ctx.value.trim(),ins:F.ins.value.trim()}}
+function puntaje(v){var p=0;CRIT.forEach(function(c){if(c.f(v))p+=c.p});return p}
+function hallazgosPII(txt){var out=[];PII.forEach(function(x){if(x.re.test(txt)&&out.indexOf(x.q)<0)out.push(x.q)});return out}
+function evaluar(){
+  var v=valores(),todo=[v.rol,v.ctx,v.ins].join(" "),pts=0;
+  $("#checks").innerHTML=CRIT.map(function(c){var ok=c.f(v);if(ok)pts+=c.p;return '<li class="'+(ok?"on":"")+'"><span class="mk">'+(ok?"✓":"·")+'</span><span>'+c.t+'<span class="ms">'+c.m+'</span></span></li>'}).join("");
+  $("#fill").style.width=pts+"%";
+  var s=$("#score");s.innerHTML=pts+"<sub>/100</sub>";
+  s.style.setProperty("--sc",pts>=80?"var(--ok)":pts>=50?"#b45309":pts>0?"var(--bad)":"var(--ink45)");
+  $("#fill").style.setProperty("--sc",pts>=80?"var(--ok)":pts>=50?"#b45309":pts>0?"var(--bad)":"var(--ink45)");
+  $("#verdict").textContent=!todo.trim()?"Empiece a escribir":pts>=85?"Listo para probar en los tres modelos":pts>=65?"Bien, pula el detalle":pts>=40?"Falta contexto o formato":"Todavía es un pedido vago";
+  var h=hallazgosPII(todo),box=$("#pii");box.classList.toggle("on",h.length>0);
+  if(h.length)box.innerHTML="<b>Detectamos "+h.slice(0,3).join(", ")+(h.length>3?" y otros datos":"")+".</b> Reemplácelo por un marcador, por ejemplo [cédula] o [causa], antes de pegar el texto en una herramienta de IA.";
+  ["rol","ctx","ins"].forEach(function(k){$("#c-"+k).textContent=v[k].length});
+  S.rol=F.rol.value;S.ctx=F.ctx.value;S.ins=F.ins.value;guardar();
+}
+F.rol.value=S.rol||"";F.ctx.value=S.ctx||"";F.ins.value=S.ins||"";
+Object.keys(F).forEach(function(k){F[k].addEventListener("input",evaluar)});
+function textoPrompt(){var v=valores();return "ROL\n"+v.rol+"\n\nCONTEXTO\n"+v.ctx+"\n\nINSTRUCCIÓN\n"+v.ins}
+$("#copiar").addEventListener("click",function(){copiar(textoPrompt(),"Prompt copiado")});
+$("#limpiar").addEventListener("click",function(){F.rol.value="";F.ctx.value="";F.ins.value="";evaluar();toast("Campos limpios")});
+$("#ejemplo").addEventListener("click",function(){
+  if((F.rol.value||F.ctx.value||F.ins.value)&&!window.confirm("Se reemplazará lo que escribió. ¿Continuar?"))return;
+  F.rol.value=EJ.rol;F.ctx.value=EJ.ctx;F.ins.value=EJ.ins;
+  if(!S.campos.vaga){S.campos.vaga=EJ.vaga;$('[data-k=vaga]').value=EJ.vaga}
+  evaluar();toast("Ejemplo cargado");
+});
+$("#guardar").addEventListener("click",function(){
+  var v=valores();if(!v.rol&&!v.ctx&&!v.ins){toast("Escriba el prompt primero");return}
+  S.versiones.push({rol:v.rol,ctx:v.ctx,ins:v.ins,score:puntaje(v),fallo:"",cambio:"",fecha:new Date().toISOString().slice(0,16).replace("T"," ")});
+  guardar();pintarVersiones();toast("Versión "+S.versiones.length+" guardada");
+});
+
+/* ── versiones ── */
+function pintarVersiones(){
+  var c=$("#vers");c.innerHTML="";
+  var vaga=S.campos.vaga||"";
+  var v0=document.createElement("div");v0.className="ver";
+  v0.innerHTML='<div class="vh"><b>Versión 0 · vaga</b><span class="code">punto de partida</span></div><pre>'+(vaga?esc(vaga):"Escriba la versión vaga en la pestaña 1.")+"</pre>";
+  c.appendChild(v0);
+  S.versiones.forEach(function(v,i){
+    var d=document.createElement("div");d.className="ver";
+    d.innerHTML='<div class="vh"><b>Versión '+(i+1)+(i===S.versiones.length-1?" · más reciente":"")+'</b><span class="code">'+v.score+"/100 · "+esc(v.fecha)+'</span></div><pre>'+esc("ROL\n"+v.rol+"\n\nCONTEXTO\n"+v.ctx+"\n\nINSTRUCCIÓN\n"+v.ins)+'</pre>'
+     +'<label class="fld"><span>Qué falló en las pruebas</span><textarea data-i="'+i+'" data-f="fallo" rows="2">'+esc(v.fallo)+'</textarea></label>'
+     +'<label class="fld"><span>Qué cambié y por qué</span><textarea data-i="'+i+'" data-f="cambio" rows="2">'+esc(v.cambio)+'</textarea></label>'
+     +'<div class="btnrow"><button class="copy" type="button" data-cargar="'+i+'">Cargar en el editor</button><button class="copy" type="button" data-borrar="'+i+'">Borrar</button></div>';
+    c.appendChild(d);
+  });
+  var n=S.versiones.length;
+  $("#vprog").textContent=n+" de 3 iteraciones mínimas";
+  $("#vbar").style.width=Math.min(100,n/3*100)+"%";
+  $("#vbar").style.setProperty("--sc",n>=3?"var(--ok)":"var(--gold-d)");
+}
+$("#vers").addEventListener("input",function(e){var t=e.target;if(t.dataset.i!==undefined){S.versiones[+t.dataset.i][t.dataset.f]=t.value;guardar()}});
+$("#vers").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  if(b.dataset.cargar!==undefined){var v=S.versiones[+b.dataset.cargar];F.rol.value=v.rol;F.ctx.value=v.ctx;F.ins.value=v.ins;evaluar();ir("prompt",true);toast("Versión cargada")}
+  if(b.dataset.borrar!==undefined){if(window.confirm("¿Borrar esta versión?")){S.versiones.splice(+b.dataset.borrar,1);guardar();pintarVersiones()}}
+});
+
+/* ── pruebas ── */
+function clave(m,c){return m+"|"+c}
+function pintarModelos(){
+  var c=$("#modelos");c.innerHTML="";
+  S.modelos.forEach(function(m,i){
+    var l=document.createElement("label");l.className="fld";
+    l.innerHTML="<span>Modelo "+(i+1)+"</span><input type=\"text\" value=\""+esc(m)+"\" data-m=\""+i+"\" placeholder=\"ChatGPT, Claude, Gemini, Copilot\">";
+    c.appendChild(l);
+  });
+}
+$("#modelos").addEventListener("input",function(e){var t=e.target;if(t.dataset.m!==undefined){S.modelos[+t.dataset.m]=t.value;guardar();pintarMatriz();pintarResumen()}});
+function celda(mi,ci){
+  var k=clave(mi,CASOS[ci].k),p=S.pruebas[k]||{sc:[0,0,0,0,0],msg:"",ev:"",obs:""};
+  var n=p.sc.reduce(function(a,b){return a+b},0);
+  var d=document.createElement("div");d.className="cell";d.dataset.k=k;
+  d.innerHTML='<h4>'+esc(S.modelos[mi]||"Modelo "+(mi+1))+" · "+CASOS[ci].t+'<span class="n">'+n+'/5</span></h4><div class="hint">'+CASOS[ci].h+'</div>'
+   +CRITP.map(function(t,i){return '<label class="c"><input type="checkbox" data-c="'+i+'"'+(p.sc[i]?" checked":"")+'> '+t+'</label>'}).join("")
+   +'<label class="fld" style="margin-top:8px"><span>Mensaje usado</span><textarea data-f="msg" rows="2">'+esc(p.msg)+'</textarea></label>'
+   +'<label class="fld"><span>Evidencia (captura, fecha)</span><input type="text" data-f="ev" value="'+esc(p.ev)+'" placeholder="captura-claude-normal.png, 27/10/2026"></label>'
+   +'<label class="fld"><span>Observación</span><textarea data-f="obs" rows="2">'+esc(p.obs)+'</textarea></label>';
+  return d;
+}
+function pintarMatriz(){
+  var c=$("#matriz");c.innerHTML="";
+  S.modelos.forEach(function(m,mi){
+    var h=document.createElement("h3");h.textContent=m||"Modelo "+(mi+1);c.appendChild(h);
+    var g=document.createElement("div");g.className="grid3";
+    CASOS.forEach(function(x,ci){g.appendChild(celda(mi,ci))});
+    c.appendChild(g);
+  });
+}
+$("#matriz").addEventListener("input",function(e){
+  var cell=e.target.closest(".cell");if(!cell)return;
+  var k=cell.dataset.k,p=S.pruebas[k]||(S.pruebas[k]={sc:[0,0,0,0,0],msg:"",ev:"",obs:""});
+  var t=e.target;
+  if(t.dataset.c!==undefined){p.sc[+t.dataset.c]=t.checked?1:0;cell.querySelector(".n").textContent=p.sc.reduce(function(a,b){return a+b},0)+"/5"}
+  if(t.dataset.f)p[t.dataset.f]=t.value;
+  guardar();pintarResumen();
+});
+function pintarResumen(){
+  var t=$("#resumen"),h="<tr><th>Modelo</th>"+CASOS.map(function(c){return "<th>"+c.t+"</th>"}).join("")+"<th>Total</th><th>Ejecuciones completas</th></tr>",tot=[],mx=-1;
+  S.modelos.forEach(function(m,mi){
+    var s=0,comp=0;
+    CASOS.forEach(function(c){var p=S.pruebas[clave(mi,c.k)];if(p){s+=p.sc.reduce(function(a,b){return a+b},0);if(p.msg&&p.ev)comp++}});
+    tot.push([s,comp]);if(s>mx)mx=s;
+  });
+  S.modelos.forEach(function(m,mi){
+    h+="<tr><td><b>"+esc(m||"Modelo "+(mi+1))+"</b></td>"+CASOS.map(function(c){var p=S.pruebas[clave(mi,c.k)];return "<td>"+(p?p.sc.reduce(function(a,b){return a+b},0):0)+"/5</td>"}).join("")+'<td class="'+(tot[mi][0]===mx&&mx>0?"best":"")+'">'+tot[mi][0]+"/15</td><td>"+tot[mi][1]+" de 3</td></tr>";
+  });
+  t.innerHTML=h;
+}
+function ejecucionesCompletas(){var n=0;S.modelos.forEach(function(m,mi){CASOS.forEach(function(c){var p=S.pruebas[clave(mi,c.k)];if(p&&p.msg&&p.ev)n++})});return n}
+
+/* ── informe ── */
+function armarInforme(){
+  var f=S.campos,v=valores(),L=[];
+  L.push("# Laboratorio de prompts. Tarea final del módulo 3\n");
+  L.push("## 1. Ficha de la tarea");
+  L.push("- **Tarea:** "+(f.tarea||"pendiente"));L.push("- **Quién la hace hoy y cuánto tarda:** "+(f.quien||"pendiente"));
+  L.push("- **Riesgos si falla:** "+(f.riesgos||"pendiente"));L.push("- **Qué delego y qué no:** "+(f.delega||"pendiente")+"\n");
+  L.push("## 2. Evolución del prompt");
+  L.push("### Versión 0 (vaga)\n"+(f.vaga||"pendiente")+"\n");
+  S.versiones.forEach(function(x,i){
+    L.push("### Versión "+(i+1)+" ("+x.score+"/100)\n**Qué falló:** "+(x.fallo||"pendiente")+"\n\n**Qué cambió y por qué:** "+(x.cambio||"pendiente")+"\n\n```\nROL\n"+x.rol+"\n\nCONTEXTO\n"+x.ctx+"\n\nINSTRUCCIÓN\n"+x.ins+"\n```\n");
+  });
+  L.push("### Versión final en el editor ("+puntaje(v)+"/100)\n```\n"+textoPrompt()+"\n```\n");
+  L.push("## 3. Matriz de pruebas");
+  S.modelos.forEach(function(m,mi){
+    L.push("### "+(m||"Modelo "+(mi+1)));
+    CASOS.forEach(function(c){
+      var p=S.pruebas[clave(mi,c.k)]||{sc:[0,0,0,0,0],msg:"",ev:"",obs:""};
+      L.push("**"+c.t+"** ("+p.sc.reduce(function(a,b){return a+b},0)+"/5)");
+      L.push(CRITP.map(function(t,i){return "- ["+(p.sc[i]?"x":" ")+"] "+t}).join("\n"));
+      L.push("- Mensaje: "+(p.msg||"pendiente"));L.push("- Evidencia: "+(p.ev||"pendiente"));L.push("- Observación: "+(p.obs||"")+"\n");
+    });
+  });
+  L.push("## 4. Análisis comparativo entre modelos\n"+(f.analisis||"pendiente")+"\n");
+  L.push("## 5. Evaluación de impacto y protocolo de uso responsable");
+  [["Finalidad y datos que se tratarían","p_datos"],["Base de legitimación y titulares","p_base"],["Riesgos para los titulares","p_riesgos"],["Medidas de mitigación","p_medidas"],["Secreto profesional y verificación de citas","p_secreto"],["Trazabilidad y responsabilidad del abogado","p_resp"]].forEach(function(x){L.push("- **"+x[0]+":** "+(f[x[1]]||"pendiente"))});
+  L.push("\n## 6. Sustentación\nDiez minutos con demostración en vivo del prompt en dos modelos.\n");
+  L.push("_Declaración de uso de IA: indique aquí las herramientas usadas para construir este trabajo._");
+  return L.join("\n");
+}
+function pintarInforme(){
+  var f=S.campos,v=valores(),todo=[f.tarea,f.quien,f.riesgos,f.delega,f.vaga,v.rol,v.ctx,v.ins,f.analisis,f.p_datos,f.p_base,f.p_riesgos,f.p_medidas,f.p_secreto,f.p_resp].join(" "),
+  items=[
+   ["Ficha completa de la tarea",!!(f.tarea&&f.quien&&f.riesgos&&f.delega)],
+   ["Versión vaga y al menos tres iteraciones con falla y cambio",!!f.vaga&&S.versiones.length>=3&&S.versiones.every(function(x){return x.fallo&&x.cambio})],
+   ["Prompt final con 80 puntos o más en el medidor",puntaje(v)>=80],
+   ["Nueve ejecuciones con mensaje y evidencia",ejecucionesCompletas()>=9],
+   ["Análisis comparativo de al menos 250 palabras",words(f.analisis||"")>=250],
+   ["Evaluación de impacto y protocolo completos",["p_datos","p_base","p_riesgos","p_medidas","p_secreto","p_resp"].every(function(k){return (f[k]||"").trim().length>20})],
+   ["Sin datos personales detectados en el texto",hallazgosPII(todo).length===0]
+  ];
+  $("#lista").innerHTML=items.map(function(x){return '<li class="'+(x[1]?"ok":"no")+'">'+x[0]+"</li>"}).join("");
+}
+$("#copiar-informe").addEventListener("click",function(){copiar(armarInforme(),"Informe copiado")});
+$("#bajar-informe").addEventListener("click",function(){bajar("informe-laboratorio-prompts.md",armarInforme(),"text/markdown")});
+$("#bajar-json").addEventListener("click",function(){bajar("respaldo-laboratorio-prompts.json",JSON.stringify(S),"application/json")});
+$("#subir-json").addEventListener("change",function(e){
+  var fl=e.target.files[0];if(!fl)return;var r=new FileReader();
+  r.onload=function(){try{var o=JSON.parse(r.result);for(var k in o)S[k]=o[k];guardar();location.reload()}catch(x){toast("El archivo no es un respaldo válido")}};
+  r.readAsText(fl);
+});
+
+/* ── arranque ── */
+pintarModelos();pintarMatriz();pintarResumen();pintarVersiones();evaluar();
+ir((location.hash||"").replace("#","")||"prompt",false);
+</script>
+</body>
+</html>

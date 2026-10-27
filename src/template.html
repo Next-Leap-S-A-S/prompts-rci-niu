@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 3 · Prompt engineering y asistentes para el derecho | Diplomado NIU</title>
+<meta name="description" content="Material del módulo 3 del Diplomado en IA y Protección de Datos: prompt engineering en el derecho, herramientas avanzadas y GPTs personalizados.">
+<link rel="icon" href="{{LOGO_PNG}}">
+<style>
+{{FONT_CSS}}
+/* Identidad visual del Diplomado: granate, dorado y azul noche, formas inclinadas y escudo. */
+:root{
+  --maroon:#801711;--maroon-d:#3a0b08;--night:#120505;--navy:#15193E;--gold:#F5A81C;--gold-d:#9a5f00;
+  --paper:#E4E5EC;--card:#fff;--line:rgba(21,25,62,.13);--line-h:rgba(21,25,62,.24);--surface:rgba(21,25,62,.045);
+  --ink:#111114;--ink75:#3d3f4d;--ink60:#575a6b;--ink45:#7c7f90;
+  --rol:#801711;--ctx:#15193E;--ins:#9a5f00;--ok:#16794a;--bad:#b91c1c;
+  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;
+  --dark:linear-gradient(125deg,#0b0303 0%,#2a0907 45%,#801711 100%);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:100px}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+@media(max-width:640px){.wrap{padding:0 16px}}
+.code{font-family:var(--mono);font-size:11px;color:var(--ink45);letter-spacing:.02em}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold);margin:0 0 12px;font-weight:600}
+button{font-family:var(--sans);cursor:pointer}
+h1,h2,h3{letter-spacing:-.015em;line-height:1.12;margin:0}
+p{margin:0 0 12px}
+
+.nav{position:sticky;top:0;z-index:50;background:var(--dark);border-bottom:1px solid rgba(255,255,255,.08)}
+.nav .wrap{display:flex;align-items:center;gap:20px;height:60px}
+.brand{display:flex;align-items:center;gap:12px;flex:none}
+.brand img{height:30px;width:auto;display:block}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:none;border:0;padding:8px 14px;border-radius:999px;font-size:13.5px;color:rgba(255,255,255,.78);white-space:nowrap;font-weight:500}
+.tab:hover{background:rgba(255,255,255,.1);color:#fff}
+.tab[aria-selected=true]{background:var(--gold);color:#1a0a08;font-weight:600}
+
+.herobg{position:relative;overflow:hidden;background:var(--dark);color:#fff}
+.herobg:before,.herobg:after{content:"";position:absolute;pointer-events:none}
+.herobg:before{left:-60px;top:-30px;width:210px;height:150px;transform:skewX(-18deg);border-radius:18px;background:linear-gradient(135deg,var(--maroon),#5b1f2a);box-shadow:70px 38px 0 -6px var(--gold),0 150px 0 -40px var(--gold)}
+.herobg:after{right:-70px;bottom:-30px;width:260px;height:170px;transform:skewX(-18deg);border-radius:18px;background:linear-gradient(135deg,#d9a233,var(--navy));box-shadow:-60px -58px 0 -10px rgba(21,25,62,.9),-130px -20px 0 -30px rgba(245,168,28,.6)}
+.hero{position:relative;z-index:1;padding:64px 0 60px;text-align:center}
+.hero .mark{height:64px;width:auto;margin:0 auto 26px;display:block}
+.hero h1{font-size:clamp(32px,5.6vw,58px);font-weight:600;max-width:15em;margin:0 auto;letter-spacing:-.02em}
+.hero h1 span{color:var(--gold)}
+.hero p.lead{font-size:18px;color:rgba(255,255,255,.82);max-width:38em;margin:20px auto 0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;justify-content:center}
+.chip{font-size:12.5px;font-weight:500;border-radius:999px;padding:6px 14px;color:#fff;background:var(--maroon);border:1px solid rgba(255,255,255,.18)}
+
+section.panel{display:none;padding:12px 0 80px}
+section.panel.on{display:block}
+.panel>.wrap>h2{font-size:30px;font-weight:600;margin:34px 0 10px;color:#000;text-transform:uppercase;letter-spacing:.01em}
+.sub{color:var(--ink75);max-width:46em;margin-bottom:24px}
+h3{font-size:18px;font-weight:600;margin:32px 0 10px;color:var(--maroon)}
+
+.card{border:1px solid var(--line);border-radius:18px;padding:20px 22px;background:var(--card);margin-bottom:14px}
+.card h4{margin:0 0 6px;font-size:16px;font-weight:600;color:var(--navy)}
+.card p:last-child{margin-bottom:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.lbl{font-family:var(--mono);font-size:11px;color:var(--maroon);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block;font-weight:500}
+ul.t{margin:0 0 12px;padding-left:20px}
+ul.t li{margin-bottom:5px}
+.note{border-left:4px solid var(--gold);padding:6px 0 6px 14px;color:var(--ink75);margin:14px 0;background:rgba(255,255,255,.55);border-radius:0 10px 10px 0}
+
+.timeline{border-left:2px solid var(--line-h);margin-left:6px}
+.slot{position:relative;padding:0 0 22px 24px}
+.slot:before{content:"";position:absolute;left:-8px;top:5px;width:14px;height:14px;border-radius:50%;background:var(--gold);border:3px solid var(--maroon)}
+.slot .when{font-family:var(--mono);font-size:12px;color:var(--maroon)}
+.slot h4{margin:2px 0 4px;font-size:17px;font-weight:600;color:var(--navy)}
+.slot p{color:var(--ink75);margin-bottom:6px}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:999px;background:var(--maroon);color:#fff;margin:0 6px 4px 0}
+
+.copy{border:1px solid var(--maroon);background:#fff;border-radius:999px;padding:7px 15px;font-size:12.5px;font-weight:600;color:var(--maroon)}
+.copy:hover{background:var(--maroon);color:#fff}
+.copy.done{background:var(--ok);border-color:var(--ok);color:#fff}
+
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.f{border:1px solid var(--line-h);background:#fff;border-radius:999px;padding:6px 14px;font-size:13px;color:var(--ink75)}
+.f[aria-pressed=true]{background:var(--maroon);color:#fff;border-color:var(--maroon)}
+details.it{border:1px solid var(--line);border-radius:16px;margin-bottom:8px;background:#fff}
+details.it>summary{list-style:none;cursor:pointer;padding:14px 18px;display:flex;gap:10px;align-items:baseline;font-weight:500}
+details.it>summary::-webkit-details-marker{display:none}
+details.it>summary:before{content:"+";font-family:var(--mono);color:var(--maroon);width:12px;flex:none;font-weight:600}
+details.it[open]>summary:before{content:"-"}
+details.it .body{padding:2px 18px 18px}
+.tagarea{font-family:var(--mono);font-size:10.5px;color:#fff;background:var(--navy);border-radius:999px;padding:2px 9px;text-transform:uppercase;letter-spacing:.05em;flex:none}
+.blk{border-radius:12px;padding:12px 15px;margin:8px 0;background:var(--surface);white-space:pre-wrap;font-size:14.5px;line-height:1.55}
+.blk b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;margin-bottom:4px}
+.blk.rol{border-left:4px solid var(--rol)}.blk.ctx{border-left:4px solid var(--ctx)}.blk.ins{border-left:4px solid var(--gold)}
+.blk.rol b{color:var(--rol)}.blk.ctx b{color:var(--ctx)}.blk.ins b{color:var(--ins)}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+@media(max-width:640px){.cmp{grid-template-columns:1fr}}
+.cmp div{border:1px solid var(--line);border-radius:12px;padding:10px 13px;font-size:14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+
+.act{border:1px solid var(--line);border-radius:18px;padding:22px 24px;margin-bottom:16px;background:#fff}
+.act .head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.act h3{margin:0;font-size:20px;color:var(--navy)}
+.num{font-family:var(--mono);font-size:12px;color:var(--maroon)}
+
+.q{border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:12px;background:#fff}
+.q p.s{font-weight:600;margin-bottom:10px;color:var(--navy)}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line-h);background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:6px;font-size:15px;color:var(--ink)}
+.opt:hover:not([disabled]){background:var(--surface)}
+.opt.ok{border-color:var(--ok);background:rgba(22,121,74,.1)}
+.opt.bad{border-color:var(--bad);background:rgba(185,28,28,.08)}
+.fb{display:none;font-size:14.5px;color:var(--ink75);margin-top:8px}
+.q.done .fb{display:block}
+.score{position:sticky;bottom:12px;margin-top:18px;border-radius:999px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--dark);color:#fff}
+.score .copy{background:var(--gold);border-color:var(--gold);color:#1a0a08}
+textarea{width:100%;min-height:92px;border:1px solid var(--line-h);border-radius:12px;padding:10px 12px;font:15px/1.5 var(--sans);resize:vertical}
+input[type=datetime-local]{border:1px solid var(--line-h);border-radius:999px;padding:6px 12px;font:14px var(--sans);background:#fff}
+.model{display:none;margin-top:10px;background:var(--surface);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.model.on{display:block}
+
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:10px 0 16px}
+th,td{border-bottom:1px solid var(--line);text-align:left;padding:9px 10px;vertical-align:top}
+th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--maroon);font-weight:500}
+.tw{overflow-x:auto}
+footer{position:relative;overflow:hidden;background:var(--dark);color:rgba(255,255,255,.82);padding:30px 0 40px;font-size:13.5px}
+footer .wrap{display:flex;gap:16px;align-items:center}
+footer img{height:34px;width:auto}
+@media print{.nav,.copy,.score,.filters,.herobg:before,.herobg:after{display:none}section.panel{display:block !important;page-break-before:always}details.it{border:0}details.it>*{display:block}.herobg,footer{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <div class="brand"><img src="{{NIU_BLANCO}}" alt="Northern International University" width="82" height="30"></div>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+</div></header>
+
+<main>
+<div class="herobg"><div class="wrap hero">
+  <img class="mark" src="{{NIU_DORADO}}" alt="Northern International University" width="175" height="64">
+  <p class="eyebrow">Diplomado en IA y Protección de Datos · Módulo 3</p>
+  <h1>Prompt engineering en el derecho, <span>herramientas avanzadas</span> y GPTs personalizados</h1>
+  <p class="lead">Una sesión para aprender a pedirle trabajo jurídico a una IA con método, a verificar lo que devuelve y a convertir una tarea repetida en un asistente propio.</p>
+  <div class="meta"><span class="chip">3 bloques</span><span class="chip">3 tareas semanales · 30%</span><span class="chip">Tarea final · 70%</span><span class="chip">Aprobación 7/10</span></div>
+</div></div>
+
+<!-- 1. RUTA -->
+<section class="panel" id="p-ruta"><div class="wrap">
+  <h2>Ruta de la clase</h2>
+  <p class="sub">Tres horas, con tiempos pensados para ajustarse a la duración real. Cada bloque cierra con una actividad que produce algo entregable.</p>
+  <div class="timeline">
+    <div class="slot"><span class="when">0:00 a 0:15</span><h4>Apertura, evaluación y prompt de entrada</h4>
+      <p>Se explican las tareas semanales y la tarea final, con sus pesos, criterios y fechas, como exige el modelo académico del diplomado. Después cada participante escribe, sin ayuda, el prompt que usaría hoy para una tarea real. Se guarda para compararlo al final.</p><span class="pill">Tarea 1</span></div>
+    <div class="slot"><span class="when">0:15 a 1:15</span><h4>Bloque 1. Prompt engineering en el derecho</h4>
+      <p>El marco Rol, Contexto, Instrucción. Por qué un prompt vago produce un escrito que el juez inadmite. Verificación de citas, alucinaciones y datos personales.</p><span class="pill">Tarea 1</span><span class="pill">Tarea 2</span></div>
+    <div class="slot"><span class="when">1:15 a 1:25</span><h4>Pausa</h4></div>
+    <div class="slot"><span class="when">1:25 a 2:05</span><h4>Bloque 2. Herramientas avanzadas</h4>
+      <p>Ventana de contexto, documentos de apoyo, recuperación sobre fuentes, salida estructurada, verificación cruzada, habilidades y complementos. Qué herramienta sirve para qué tarea.</p></div>
+    <div class="slot"><span class="when">2:05 a 2:50</span><h4>Bloque 3. GPTs y asistentes personalizados</h4>
+      <p>Los siete ingredientes de un asistente. Construcción de uno en la plataforma que cada participante use, con prueba de límites.</p><span class="pill">Tarea 3</span></div>
+    <div class="slot"><span class="when">2:50 a 3:00</span><h4>Test y encargo del trabajo final</h4>
+      <p>Test de autoevaluación de diez preguntas, sin calificación. Lectura de las condiciones de la tarea final y resolución de dudas.</p></div>
+  </div>
+
+  <h3>Qué debe quedar claro al terminar</h3>
+  <ul class="t">
+    <li>Un prompt jurídico tiene tres partes y cada una resuelve un fallo distinto.</li>
+    <li>Ninguna cita sale de la IA sin verificarse en la fuente oficial.</li>
+    <li>Los datos personales y los identificadores de expediente se reemplazan antes de pegar el caso.</li>
+    <li>Un asistente personalizado guarda instrucciones y documentos para repetir una tarea con el mismo criterio.</li>
+    <li>La decisión, la estrategia y la firma siguen siendo del abogado.</li>
+  </ul>
+
+  <h3>Notas para quien dicta</h3>
+  <div class="note">Abrir con el prompt de entrada y no corregirlo. El contraste con el prompt RCI de la tarea 1 es la mejor demostración del bloque 1.</div>
+  <div class="note">En la tarea 2 conviene asignar temas distintos por grupo. Así se ven errores distintos y nadie copia al vecino.</div>
+  <div class="note">Si la sala usa plataformas distintas, la tarea 3 se hace igual. La receta es la misma y solo cambia dónde se pega.</div>
+  <div class="note">Todas las tareas deben quedar publicadas en el aula virtual con objetivos, descripción, formato de entrega y fecha límite. Complete las fechas en la pestaña Tareas y copie cada enunciado.</div>
+</div></section>
+
+<!-- 2. PROMPTS -->
+<section class="panel" id="p-prompts"><div class="wrap">
+  <h2>Biblioteca de prompts</h2>
+  <p class="sub">Cincuenta y cuatro prompts con rol, contexto e instrucción. Seis son de protección de datos personales e IA con el marco ecuatoriano. Los otros cuarenta y ocho son de práctica general y se escribieron con normas colombianas, así que sirven como modelo de método y exigen adaptar el marco normativo. Cada uno trae la versión vaga con la que casi todos empiezan y la razón por la que falla. Los campos entre corchetes se completan con el caso, ya anonimizado.</p>
+
+  <div class="grid" style="margin-bottom:8px">
+    <div class="card" style="border-top:3px solid var(--rol)"><span class="lbl" style="color:var(--rol)">Rol</span><p>Quién debería hacer la tarea. Formación, experiencia, sesgo útil y tono.</p></div>
+    <div class="card" style="border-top:3px solid var(--ctx)"><span class="lbl" style="color:var(--ctx)">Contexto</span><p>Los hechos, el estado del trámite, los documentos y lo que ya se intentó.</p></div>
+    <div class="card" style="border-top:3px solid var(--ins)"><span class="lbl" style="color:var(--ins)">Instrucción</span><p>Pasos numerados, formato de salida, límites y criterios de verificación.</p></div>
+  </div>
+
+  <details class="it" style="margin:18px 0 14px"><summary><span class="tagarea">Adaptación</span><span>Equivalencias de Colombia a Ecuador para los prompts de práctica general</span></summary>
+    <div class="body"><div class="tw"><table>
+      <tr><th>En el prompt (Colombia)</th><th>En Ecuador</th></tr>
+      <tr><td>Acción de tutela, Decreto 2591 de 1991</td><td>Acción de protección y demás garantías jurisdiccionales, Constitución y Ley Orgánica de Garantías Jurisdiccionales y Control Constitucional</td></tr>
+      <tr><td>Código General del Proceso</td><td>Código Orgánico General de Procesos</td></tr>
+      <tr><td>Código Sustantivo del Trabajo</td><td>Código del Trabajo</td></tr>
+      <tr><td>Código Penal y Código de Procedimiento Penal</td><td>Código Orgánico Integral Penal</td></tr>
+      <tr><td>Ley 80 de 1993 y contratación estatal</td><td>Ley Orgánica del Sistema Nacional de Contratación Pública y su reglamento</td></tr>
+      <tr><td>Derecho de petición, artículo 23 de la Constitución</td><td>Derecho de petición, Constitución de la República, artículo 66</td></tr>
+      <tr><td>CPACA y jurisdicción contencioso administrativa</td><td>Código Orgánico Administrativo y vía contencioso administrativa del Código Orgánico General de Procesos</td></tr>
+      <tr><td>Ley 1581 de 2012 y Superintendencia de Industria y Comercio</td><td>Ley Orgánica de Protección de Datos Personales y Superintendencia de Protección de Datos Personales</td></tr>
+      <tr><td>Corte Constitucional, Consejo de Estado, Corte Suprema</td><td>Corte Constitucional del Ecuador y Corte Nacional de Justicia</td></tr>
+      <tr><td>Cédula, NIT y radicado de 23 dígitos</td><td>Cédula, RUC y número de causa</td></tr>
+    </table></div>
+    <p class="code">Verifique la vigencia de cada norma antes de citarla. La IA no conoce siempre las reformas recientes.</p></div></details>
+
+  <div class="filters" id="filtros" role="group" aria-label="Área"></div>
+  <div id="lista-prompts"></div>
+</div></section>
+
+<!-- 3. HERRAMIENTAS Y GPTS -->
+<section class="panel" id="p-herr"><div class="wrap">
+  <h2>Herramientas avanzadas</h2>
+  <p class="sub">Escribir bien el prompt es la mitad del trabajo. La otra mitad es saber qué hace la herramienta con lo que se le entrega.</p>
+
+  <div class="grid">
+    <div class="card"><h4>Ventana de contexto</h4><p>Es lo que el modelo puede leer en un momento dado. Incluye las instrucciones, los archivos adjuntos, parte de la conversación y el historial del mismo chat. Cuando se llena, lo más antiguo se pierde.</p></div>
+    <div class="card"><h4>Máximo de salida</h4><p>Es lo que el modelo puede escribir en una respuesta. Una demanda larga o un análisis de cincuenta folios se pide por partes.</p></div>
+    <div class="card"><h4>Recuperación sobre fuentes (RAG)</h4><p>Primero se construye la base de documentos. Luego el modelo busca en ella, selecciona las fuentes que sirven y redacta con base en ellas. Si no hay fuentes, debe responder que no tiene información. Quien pregunta debe anticipar que la base contiene lo necesario.</p></div>
+    <div class="card"><h4>Caja negra y caja de cristal</h4><p>Un modelo general no deja ver en qué fuente se apoyó. Un sistema con recuperación sí permite rastrear la respuesta hasta el documento. En derecho se prefiere lo segundo.</p></div>
+    <div class="card"><h4>Complacencia</h4><p>Los modelos tienden a darle la razón a quien pregunta. Se mitiga pidiendo la posición contraria, los puntos débiles del argumento y las razones por las que el juez negaría la pretensión.</p></div>
+    <div class="card"><h4>Habilidades y complementos</h4><p>Una habilidad es un prompt guardado que se invoca con una orden corta. Un complemento es un conjunto de habilidades que se instala. Sirven para estandarizar tareas de un equipo.</p></div>
+  </div>
+
+  <h3>Formatos que la IA lee completos</h3>
+  <div class="tw"><table>
+    <tr><th>Tipo</th><th>Formatos, del más limpio al más pesado</th><th>Observación</th></tr>
+    <tr><td>Texto sin estructura</td><td>.txt, .md, .pdf, .docx</td><td>El texto plano pesa poco y deja al modelo leer solo el contenido.</td></tr>
+    <tr><td>Datos estructurados</td><td>.csv, .xlsx</td><td>Útiles para cuantías, términos, listados de procesos.</td></tr>
+    <tr><td>Escaneos y fotos</td><td>PDF imagen, JPG</td><td>Requieren reconocimiento óptico de caracteres antes de cargarse. Sin eso el modelo no lee el texto.</td></tr>
+  </table></div>
+
+  <h3>Qué herramienta para qué tarea</h3>
+  <div class="tw"><table>
+    <tr><th>Tarea</th><th>Herramienta</th><th>Cuidado</th></tr>
+    <tr><td>Borrador de escrito con hechos propios</td><td>Chat con prompt RCI</td><td>Verificar cada artículo y cada cita.</td></tr>
+    <tr><td>Leer un expediente largo</td><td>Documentos cargados en un proyecto o asistente</td><td>Anonimizar y confirmar que el PDF tenga texto.</td></tr>
+    <tr><td>Buscar jurisprudencia</td><td>Búsqueda con fuentes y relatoría oficial</td><td>Abrir cada enlace. La IA puede citar bien y atribuir mal.</td></tr>
+    <tr><td>Repetir una tarea con el mismo criterio</td><td>Asistente personalizado</td><td>Probar límites antes de compartirlo.</td></tr>
+    <tr><td>Procesar listados</td><td>Hoja de cálculo con salida en tabla</td><td>Revisar fila por fila las fórmulas.</td></tr>
+  </table></div>
+</div></section>
+
+<section class="panel" id="p-gpts"><div class="wrap">
+  <h2>GPTs y asistentes personalizados</h2>
+  <p class="sub">Un asistente personalizado es un chat con instrucciones y documentos guardados. En ChatGPT se llama GPT, en Claude proyecto, en Gemini gem y en Microsoft 365 Copilot agente. La receta se pega igual en todos.</p>
+
+  <h3>Los siete ingredientes</h3>
+  <div class="grid">
+    <div class="card"><h4>1. Nombre y descripción</h4><p>Qué hace y para quién. Un nombre claro evita usarlo para lo que no sabe hacer.</p></div>
+    <div class="card"><h4>2. Instrucciones</h4><p>El prompt en Rol, Contexto, Instrucción, escrito una sola vez.</p></div>
+    <div class="card"><h4>3. Modelo</h4><p>El más capaz disponible para tareas de razonamiento. Uno rápido para clasificar.</p></div>
+    <div class="card"><h4>4. Documentos de apoyo</h4><p>Lo que no cambia entre casos: minutas, listas de chequeo, guías internas, normas.</p></div>
+    <div class="card"><h4>5. Archivos del caso</h4><p>Lo que sí cambia. Se adjunta en cada conversación, anonimizado.</p></div>
+    <div class="card"><h4>6. Herramientas</h4><p>Búsqueda, ejecución de cálculos, conexión con otras aplicaciones. Cada una amplía lo que puede salir mal.</p></div>
+    <div class="card"><h4>7. Límites y escalamiento</h4><p>Qué no debe concluir, qué debe preguntar y cuándo debe devolver la decisión al abogado.</p></div>
+  </div>
+
+  <h3>Asistentes listos para copiar</h3>
+  <p class="sub">Dieciséis asistentes con rol, contexto e instrucción completos, los archivos que conviene cargar, tres mensajes de prueba y lo que hay que revisar en la respuesta. Los cuatro primeros son de protección de datos con la LOPDP. Los doce siguientes son de práctica general con normas colombianas y se adaptan con la tabla de equivalencias de la pestaña Prompts.</p>
+  <div id="lista-asistentes"></div>
+</div></section>
+
+<!-- 4. TAREAS -->
+<section class="panel" id="p-act"><div class="wrap">
+  <h2>Tareas semanales</h2>
+  <p class="sub">El módulo se aprueba con una nota mínima de 7 sobre 10. Las tareas semanales valen el 30% y la tarea final el 70%. El 30% se reparte en partes iguales entre las tareas que se asignen. Con tres tareas, cada una vale el 10% de la nota del módulo.</p>
+
+  <div class="grid" style="margin-bottom:8px">
+    <div class="card"><span class="lbl">Fórmula</span><p>Nota del módulo = 0,30 × promedio de tareas semanales + 0,70 × tarea final. Todas las notas se expresan sobre 10.</p></div>
+    <div class="card"><span class="lbl">Si cambia el número de tareas</span><p>Cada tarea pesa 30% dividido entre el total. Con dos tareas, 15% cada una. Con cuatro, 7,5%.</p></div>
+    <div class="card"><span class="lbl">Antes de publicar</span><p>Complete la fecha y hora límite de cada tarea. Las tareas se explican en la primera sesión y quedan visibles en el aula virtual con objetivos, descripción, formato de entrega y fecha.</p></div>
+  </div>
+  <div id="acts"></div>
+  <p class="note">Retroalimentación. Cada entrega recibe comentarios sobre fortalezas y áreas de mejora en la argumentación jurídica y en el uso de las herramientas, antes de la siguiente tarea.</p>
+</div></section>
+
+<!-- 5. TEST -->
+<section class="panel" id="p-test"><div class="wrap">
+  <h2>Test del módulo</h2>
+  <p class="sub">Diez preguntas de selección con retroalimentación inmediata, para comprobar lo visto en clase. Es una autoevaluación y no tiene peso en la nota. Al final hay dos preguntas abiertas con respuesta modelo.</p>
+  <div id="test"></div>
+  <div class="score"><span id="marcador">0 de 10 respondidas</span><button class="copy" id="reiniciar" type="button">Reiniciar</button></div>
+
+  <h3>Dos preguntas abiertas</h3>
+  <div id="abiertas"></div>
+</div></section>
+
+<!-- 6. LECTURAS Y TAREA FINAL -->
+<section class="panel" id="p-final"><div class="wrap">
+  <h2>Lecturas</h2>
+  <p class="sub">Verifique en la fuente oficial la vigencia y el texto de cada norma o providencia antes de citarla. Esa regla es parte del módulo.</p>
+  <div class="grid">
+    <div class="card"><span class="lbl">Obligatorias</span>
+      <ul class="t">
+        <li>Ley Orgánica de Protección de Datos Personales de Ecuador y su reglamento general.</li>
+        <li>Constitución de la República del Ecuador, artículo 66, sobre el derecho a la protección de datos personales.</li>
+        <li>Mata v. Avianca, Inc., Tribunal del Distrito Sur de Nueva York, 2023, decisión de sanciones por citas inexistentes generadas con IA.</li>
+      </ul></div>
+    <div class="card"><span class="lbl">Complementarias</span>
+      <ul class="t">
+        <li>Magesh et al., Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools, Stanford, 2024.</li>
+        <li>Reglamento General de Protección de Datos de la Unión Europea, como referencia comparada.</li>
+        <li>Reglamento (UE) 2024/1689, sobre inteligencia artificial.</li>
+        <li>UNESCO, Recomendación sobre la ética de la inteligencia artificial, 2021.</li>
+        <li>Corte Constitucional de Colombia, Sentencia T-323 de 2024, sobre IA generativa en una decisión judicial, como derecho comparado.</li>
+      </ul></div>
+    <div class="card"><span class="lbl">Guías de los proveedores</span>
+      <ul class="t">
+        <li>Anthropic, guía de ingeniería de prompts, en su documentación oficial.</li>
+        <li>OpenAI, guía de ingeniería de prompts, en su documentación oficial.</li>
+        <li>Resoluciones y guías de la Superintendencia de Protección de Datos Personales.</li>
+      </ul></div>
+  </div>
+
+  <h2 style="margin-top:44px">Tarea final: laboratorio de prompts</h2>
+  <p class="sub">Vale el 70% de la nota del módulo. Cada estudiante construye un prompt jurídico con Rol, Contexto, Instrucción, lo prueba en modelos distintos y analiza las diferencias. Es un trabajo escrito y sustentado, de elaboración propia, sin componente de selección múltiple.</p>
+
+  <div class="card"><h4>Objetivos</h4>
+    <ul class="t">
+      <li>Construir un prompt jurídico en Rol, Contexto, Instrucción para una tarea real de la práctica profesional.</li>
+      <li>Probarlo en al menos tres modelos distintos con casos normales, adversariales y con datos personales, y documentar las diferencias.</li>
+      <li>Iterar el prompt a partir de las fallas encontradas y justificar cada cambio.</li>
+      <li>Evaluar el impacto del uso del prompt en la protección de datos personales conforme a la LOPDP y definir un protocolo de uso responsable.</li>
+    </ul></div>
+
+  <div class="card"><h4>Descripción y formato de entrega</h4>
+    <p>Un solo PDF de máximo catorce páginas, sin contar anexos, con estas seis partes. Se sube al aula virtual y se sustenta oralmente.</p>
+    <ol class="t" style="padding-left:20px">
+      <li><b>Ficha de la tarea.</b> De 500 a 700 palabras. La tarea real que se elige, quién la hace hoy, cuánto tarda, qué riesgos tiene, qué se delega a la IA y qué no, con el criterio para decidirlo.</li>
+      <li><b>Evolución del prompt.</b> La versión vaga de partida, al menos tres iteraciones y la versión final en Rol, Contexto, Instrucción, lista para pegar. Para cada iteración, qué falló y qué se cambió.</li>
+      <li><b>Matriz de pruebas.</b> Mínimo tres modelos, por ejemplo ChatGPT, Claude y Gemini o Copilot, con tres casos cada uno: uno normal, uno adversarial y uno con datos personales sin anonimizar. Nueve ejecuciones con evidencia fechada, evaluadas con cinco criterios: hechos usados, formato, verificación de citas, respeto de límites y manejo de datos personales.</li>
+      <li><b>Análisis comparativo entre modelos.</b> Dos o tres páginas. En qué difirieron las respuestas, qué modelo inventó citas, cuál cedió ante la complacencia, cuál respetó los límites y qué modelo elegiría para la tarea, con las razones.</li>
+      <li><b>Evaluación de impacto y protocolo de uso responsable.</b> Dos páginas. Riesgos para los titulares, base de legitimación, medidas, secreto profesional, verificación de citas, trazabilidad y responsabilidad del abogado.</li>
+      <li><b>Sustentación oral.</b> Diez minutos con demostración en vivo del prompt en dos modelos y preguntas del docente.</li>
+    </ol>
+  </div>
+
+  <div class="card"><h4>Criterios de evaluación y pesos</h4>
+    <div class="tw"><table>
+      <tr><th>Criterio</th><th>Qué se evalúa</th><th>Peso</th></tr>
+      <tr><td>Ficha y delegación</td><td>La tarea es real, el criterio para delegar es defendible y los riesgos están identificados.</td><td>10%</td></tr>
+      <tr><td>Calidad del prompt e iteraciones</td><td>Rol preciso, contexto suficiente, instrucción con pasos, formato y verificación. Las iteraciones responden a fallas reales.</td><td>25%</td></tr>
+      <tr><td>Matriz de pruebas y evidencia</td><td>Las nueve ejecuciones están completas, son distintas entre sí y traen evidencia con fecha y modelo.</td><td>25%</td></tr>
+      <tr><td>Análisis comparativo</td><td>Identifica diferencias reales entre modelos y justifica la elección con la evidencia.</td><td>20%</td></tr>
+      <tr><td>Evaluación de impacto y protocolo</td><td>Aplica la LOPDP y el deber de verificación a la tarea elegida.</td><td>10%</td></tr>
+      <tr><td>Sustentación</td><td>Demostración en vivo, respuestas propias y dominio de lo entregado.</td><td>10%</td></tr>
+    </table></div>
+    <p class="code">Total 100%. La nota sobre 10 resulta de dividir el puntaje entre 10.</p>
+  </div>
+
+  <div class="card"><h4>Fecha y hora límite</h4>
+    <p>La entrega es improrrogable. Complete la fecha para que el enunciado salga listo para el aula virtual.</p>
+    <div class="row"><label for="fecha-final" class="code">Fecha y hora límite</label><input type="datetime-local" id="fecha-final"></div>
+    <div class="row"><button class="copy" type="button" data-copy="final">Copiar enunciado para el aula virtual</button></div>
+  </div>
+
+  <div class="card"><h4>Reglas de integridad</h4>
+    <ul class="t">
+      <li>Se puede usar IA para construir el prompt. Eso es el objeto del trabajo. Debe declararse en una nota al inicio.</li>
+      <li>Las capturas deben mostrar fecha y modelo.</li>
+      <li>Los casos usados llevan datos anonimizados. Un caso con datos reales sin anonimizar resta puntos en la evaluación de impacto y protocolo.</li>
+      <li>La sustentación oral confirma la autoría. Quien no puede explicar su prompt no aprueba el criterio de pruebas.</li>
+    </ul>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap"><img src="{{NIU_BLANCO}}" alt="Northern International University" width="93" height="34"><span>Material del Diplomado en IA y Protección de Datos, elaborado por Next Leap. Los ejemplos usan datos ficticios.</span></div></footer>
+
+<script>
+/* ── DATOS ── */
+var PROMPTS = [
+{{PROMPTS}}
+];
+{{ASISTENTES}}
+var ASISTENTES_DATOS = [
+{{ASISTENTES_DATOS}}
+];
+ASISTENTES = ASISTENTES_DATOS.concat(ASISTENTES);
+var AREAS = {datos:"Datos personales e IA (Ecuador)", civil:"Litigio civil", comercial:"Contratos y comercial", laboral:"Laboral", penal:"Penal", administrativo:"Administrativo", constitucional:"Constitucional"};
+
+var TAREAS = [
+ {n:1, t:"Del prompt vago al prompt RCI", peso:"10%",
+  obj:["Reconocer por qué un prompt vago produce un resultado inservible.","Reescribir un prompt jurídico en Rol, Contexto, Instrucción y comprobar la mejora."],
+  desc:"Escriba, sin ayuda, el prompt que usaría hoy para una tarea real de su práctica y ejecútelo. Después tome dos prompts de la biblioteca de áreas distintas, ejecute primero la versión vaga y luego la completa, con un caso ficticio. Compare las respuestas con cinco criterios: hechos usados, formato, verificación, límites y datos personales.",
+  fmt:"Un documento de una a dos páginas con el prompt de entrada, una tabla comparativa de las dos parejas de prompts y un párrafo de conclusiones.",
+  crit:["Prompt de entrada y su respuesta incluidos (2 puntos)","Tabla comparativa completa con los cinco criterios (4 puntos)","Reescritura en Rol, Contexto, Instrucción con los datos del caso (3 puntos)","Conclusiones propias y redacción clara (1 punto)"]},
+ {n:2, t:"Cacería de alucinaciones", peso:"10%",
+  obj:["Verificar citas jurisprudenciales o normativas generadas por una IA contra la fuente oficial.","Medir la confiabilidad de una respuesta y definir una regla de verificación."],
+  desc:"Con el tema que asigne el docente, por ejemplo los requisitos de procedencia de la acción de protección, pida a una IA tres sentencias con número, fecha y regla. Busque cada una en la relatoría oficial. Clasifique cada cita en una de tres categorías: existe y dice lo que se afirma, existe pero no dice eso, no existe.",
+  fmt:"Una tabla en PDF con el enlace a la fuente oficial de cada cita, su clasificación y el porcentaje de citas correctas, más media página con la regla de verificación que adoptaría su equipo.",
+  crit:["Tres citas verificadas con enlace a la fuente oficial (4 puntos)","Clasificación correcta y justificada (3 puntos)","Regla de verificación aplicable a un equipo (2 puntos)","Redacción clara (1 punto)"]},
+ {n:3, t:"Mi primer asistente y su prueba de límites", peso:"10%",
+  obj:["Configurar un asistente personalizado a partir de una receta.","Someterlo a una prueba de límites y proponer ajustes a sus instrucciones."],
+  desc:"Elija una receta de la pestaña GPTs, péguela en la plataforma que usted utilice y cargue un documento de apoyo ficticio. Ejecute los tres mensajes de prueba de la receta. Después intente que el asistente rompa sus reglas: pegue un caso con una cédula y un nombre sin anonimizar, pídale que concluya si un contrato es válido y pídale una sentencia que respalde su postura.",
+  fmt:"Un PDF con capturas fechadas del asistente configurado, el registro de las seis pruebas y una tabla de tres filas con el intento, la respuesta y el ajuste que haría a las instrucciones.",
+  crit:["Asistente configurado con capturas fechadas (3 puntos)","Registro de las seis pruebas (3 puntos)","Ajustes a las instrucciones bien fundados (3 puntos)","Redacción clara (1 punto)"]}
+];
+
+var TEST = [
+ {q:"En el marco Rol, Contexto, Instrucción, ¿dónde deben quedar escritos el formato de salida y los criterios de verificación?",
+  o:["En el rol","En el contexto","En la instrucción","En ninguna, se piden al final de la conversación"],c:2,
+  f:"La instrucción define los pasos, el formato y la verificación. El rol fija quién responde y el contexto aporta los hechos."},
+ {q:"Un asistente le entrega una sentencia con número y una cita textual que usted no encuentra en la relatoría. ¿Qué corresponde?",
+  o:["Usarla, porque el formato es correcto","Verificarla en la fuente oficial y descartarla si no existe","Pedirle al mismo modelo que confirme que existe","Citarla y marcarla como probable"],c:1,
+  f:"Preguntarle al modelo si su cita existe no es verificar. El caso Mata v. Avianca terminó en sanciones por citas inexistentes generadas con IA."},
+ {q:"¿Qué datos deben reemplazarse por marcadores antes de pegar un caso en una herramienta de IA de uso general?",
+  o:["Solo la cédula","La cédula y el nombre","Cédulas, RUC, nombres, números de causa, placas, correos y teléfonos","Ninguno si el caso ya es público"],c:2,
+  f:"Los identificadores de personas y de expediente se reemplazan siempre. Los datos de salud y otros sensibles exigen aún más cuidado según la Ley Orgánica de Protección de Datos Personales."},
+ {q:"Un sistema con recuperación sobre documentos recibe una pregunta cuya respuesta no está en su base. ¿Cuál es el comportamiento correcto?",
+  o:["Responder con lo que sabe el modelo, sin avisar","Decir que no tiene información en las fuentes cargadas","Inventar la cita más cercana","Responder más corto"],c:1,
+  f:"Si no hay fuentes, el sistema debe decir que no tiene información. Responder desde la memoria del modelo rompe la trazabilidad."},
+ {q:"La ventana de contexto de un modelo incluye:",
+  o:["Solo el último mensaje","Las instrucciones, los archivos adjuntos, parte de la conversación y el historial del mismo chat","Solo los archivos adjuntos","Solo la respuesta que va a generar"],c:1,
+  f:"Todo lo que el modelo lee en un momento dado cuenta contra la ventana. La respuesta que genera se mide aparte, en el máximo de salida."},
+ {q:"Una lista de cuarenta cláusulas obligatorias de la firma debe ir en:",
+  o:["Las instrucciones, pegada completa al inicio","Los documentos de apoyo, con una instrucción que ordene consultarla","Cada mensaje del usuario","No se puede usar en un asistente"],c:1,
+  f:"Lo que no cambia entre casos va en documentos de apoyo. Las instrucciones deben ser breves y decir cuándo consultar cada documento."},
+ {q:"¿Qué es la complacencia (sycophancy) y cuál es una mitigación útil?",
+  o:["La tendencia del modelo a coincidir con el usuario. Se mitiga pidiéndole la posición contraria y los puntos débiles","La tendencia a rechazar toda tarea. Se mitiga con prompts más cortos","La lentitud en responder. Se mitiga con otro modelo","Un error de lectura de PDF. Se mitiga con OCR"],c:0,
+  f:"Un prompt que pregunta si el argumento es bueno suele recibir un sí. Pedir las razones por las que el juez negaría la pretensión corrige ese sesgo."},
+ {q:"Va a cargar un expediente escaneado como imagen en un sistema con recuperación. ¿Qué paso previo necesita?",
+  o:["Reconocimiento óptico de caracteres","Convertirlo a Excel","Comprimirlo","Ninguno, la IA lee cualquier imagen con exactitud"],c:0,
+  f:"Sin OCR el archivo no tiene texto que recuperar. Conviene revisar una muestra del resultado antes de confiar en él."},
+ {q:"¿Qué tarea no debería delegarse sin revisión humana completa?",
+  o:["Ordenar la cronología de un expediente","Redactar un primer borrador de memorial","Decidir la estrategia de defensa y firmar el escrito","Resumir una sentencia que usted ya leyó"],c:2,
+  f:"La estrategia, la decisión y la firma son responsabilidad del abogado. Los borradores y las cronologías se delegan con revisión."},
+ {q:"¿Qué diferencia a un asistente personalizado de un chat suelto?",
+  o:["Usa un modelo distinto","Conserva instrucciones y documentos de apoyo entre conversaciones","No necesita verificación","No puede equivocarse"],c:1,
+  f:"El asistente repite una tarea con el mismo criterio porque guarda lo que un chat suelto pierde al cerrarse. Sigue necesitando verificación."}
+];
+
+var ABIERTAS = [
+ {q:"Describa una tarea de su práctica que sí delegaría en un asistente y una que no. Explique el criterio que usó para separarlas.",
+  m:"Una buena respuesta nombra tareas concretas y propone un criterio defendible. Por ejemplo: se delega lo que es repetitivo, verificable y de bajo riesgo si falla, como ordenar cronologías o primeros borradores. No se delega lo que exige juicio sobre la estrategia, lo que compromete el secreto profesional o lo que no se puede verificar con facilidad. Debe mencionar quién revisa y cómo."},
+ {q:"Reescriba en formato Rol, Contexto, Instrucción este prompt: «Hazme un contrato de arrendamiento de local». Indique además qué datos le faltan para que sea útil.",
+  m:"El rol es un abogado de contratos inmobiliarios. El contexto debe traer las partes con marcadores, el inmueble, el uso, el canon, el plazo, el reajuste, la garantía y la posición que defiende quien pide. La instrucción pide una minuta con cláusulas numeradas, una tabla de riesgos para la parte representada, marca de verificación en cada cita normativa y la pregunta por los datos faltantes antes de redactar."}
+];
+
+/* ── UTILIDADES ── */
+function $(s,r){return (r||document).querySelector(s)}
+function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function copiar(btn,texto){
+  var ok=function(){var t=btn.textContent;btn.textContent="Copiado";btn.classList.add("done");setTimeout(function(){btn.textContent=t;btn.classList.remove("done")},1400)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(texto).then(ok,function(){fallback(texto);ok()})}
+  else{fallback(texto);ok()}
+}
+function fallback(t){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(e){}document.body.removeChild(a)}
+function lista(x){return Array.isArray(x)?x:(x?[x]:[])}
+
+/* ── PESTAÑAS ── */
+var TABS=[["ruta","Ruta"],["prompts","Prompts"],["herr","Herramientas"],["gpts","GPTs"],["act","Tareas"],["test","Test"],["final","Lecturas y tarea final"]];
+(function(){
+  var nav=$("#tabs");
+  TABS.forEach(function(t){
+    var b=el("button","tab",t[1]);b.type="button";b.setAttribute("role","tab");b.dataset.id=t[0];
+    b.addEventListener("click",function(){ir(t[0],true)});nav.appendChild(b);
+  });
+  var lab=el("a","tab","Laboratorio");lab.href="laboratorio.html";lab.style.textDecoration="none";lab.style.display="inline-block";nav.appendChild(lab);
+})();
+function ir(id,empujar){
+  var ok=false;
+  TABS.forEach(function(t){if(t[0]===id)ok=true});
+  if(!ok)id="ruta";
+  document.querySelectorAll(".panel").forEach(function(p){p.classList.toggle("on",p.id==="p-"+id)});
+  document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-selected",b.dataset.id===id?"true":"false")});
+  if(empujar){try{history.replaceState(null,"","#"+id)}catch(e){}window.scrollTo({top:0})}
+}
+ir((location.hash||"").replace("#","")||"ruta",false);
+window.addEventListener("hashchange",function(){ir((location.hash||"").replace("#","")||"ruta",false)});
+
+/* ── BIBLIOTECA ── */
+(function(){
+  var cont=$("#lista-prompts"),fil=$("#filtros"),actual="todas";
+  function chip(k,txt){var b=el("button","f",txt);b.type="button";b.dataset.k=k;b.setAttribute("aria-pressed",k===actual?"true":"false");
+    b.addEventListener("click",function(){actual=k;fil.querySelectorAll(".f").forEach(function(x){x.setAttribute("aria-pressed",x.dataset.k===actual?"true":"false")});pintar()});return b}
+  fil.appendChild(chip("todas","Todas"));
+  Object.keys(AREAS).forEach(function(k){fil.appendChild(chip(k,AREAS[k]))});
+  function pintar(){
+    cont.innerHTML="";
+    PROMPTS.forEach(function(p){
+      if(actual!=="todas"&&p.a!==actual)return;
+      var d=el("details","it");
+      d.appendChild(el("summary","",'<span class="tagarea">'+esc(AREAS[p.a])+'</span><span>'+esc(p.t)+'</span>'));
+      var b=el("div","body");
+      b.appendChild(el("div","blk rol","<b>ROL</b>"+esc(p.r)));
+      b.appendChild(el("div","blk ctx","<b>CONTEXTO</b>"+esc(p.c)));
+      b.appendChild(el("div","blk ins","<b>INSTRUCCIÓN</b>"+esc(p.i)));
+      b.appendChild(el("div","cmp",'<div><span class="lbl">Versión vaga</span>'+esc(p.mal)+'</div><div><span class="lbl">Por qué falla</span>'+esc(p.por)+'</div>'));
+      b.appendChild(el("p","",'<span class="lbl">Consejo</span>'+esc(p.tip)));
+      var r=el("div","row"),btn=el("button","copy","Copiar prompt");btn.type="button";
+      btn.addEventListener("click",function(){copiar(btn,p.r+"\n\n"+p.c+"\n\n"+p.i)});
+      r.appendChild(btn);b.appendChild(r);d.appendChild(b);cont.appendChild(d);
+    });
+  }
+  pintar();
+})();
+
+/* ── ASISTENTES ── */
+(function(){
+  var cont=$("#lista-asistentes");
+  ASISTENTES.forEach(function(a){
+    var d=el("details","it");
+    d.appendChild(el("summary","",'<span class="tagarea">'+esc(a.area)+'</span><span>'+esc(a.nombre)+'</span>'));
+    var b=el("div","body");
+    b.appendChild(el("p","",esc(a.resumen)));
+    b.appendChild(el("div","blk rol","<b>ROL</b>"+esc(a.rol)));
+    b.appendChild(el("div","blk ctx","<b>CONTEXTO</b>"+esc(a.contexto)));
+    b.appendChild(el("div","blk ins","<b>INSTRUCCIÓN</b>"+esc(a.instruccion)));
+    var ex="";
+    [["Archivos de apoyo sugeridos",a.archivos],["Mensajes de prueba",a.pruebas],["Qué revisar en la respuesta",a.revisar]].forEach(function(par){
+      var l=lista(par[1]);if(!l.length)return;
+      ex+='<span class="lbl" style="margin-top:12px">'+par[0]+'</span><ul class="t">'+l.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul>";
+    });
+    b.appendChild(el("div","",ex));
+    var r=el("div","row"),btn=el("button","copy","Copiar instrucciones");btn.type="button";
+    btn.addEventListener("click",function(){copiar(btn,a.rol+"\n\n"+a.contexto+"\n\n"+a.instruccion)});
+    r.appendChild(btn);b.appendChild(r);d.appendChild(b);cont.appendChild(d);
+  });
+})();
+
+/* ── TAREAS ── */
+(function(){
+  var cont=$("#acts");
+  function fechaTxt(v){
+    if(!v)return "por definir";
+    var d=new Date(v);if(isNaN(d))return "por definir";
+    return d.toLocaleDateString("es-EC",{day:"numeric",month:"long",year:"numeric"})+", "+d.toLocaleTimeString("es-EC",{hour:"2-digit",minute:"2-digit"});
+  }
+  TAREAS.forEach(function(a){
+    var c=el("div","act");
+    c.appendChild(el("div","head",'<h3>'+esc(a.t)+'</h3><span class="num">Tarea '+a.n+' · '+esc(a.peso)+' de la nota del módulo</span>'));
+    c.appendChild(el("span","lbl","Objetivos"));
+    c.appendChild(el("ul","t",a.obj.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")));
+    c.appendChild(el("span","lbl","Descripción"));
+    c.appendChild(el("p","",esc(a.desc)));
+    c.appendChild(el("span","lbl","Formato de entrega"));
+    c.appendChild(el("p","",esc(a.fmt)));
+    c.appendChild(el("span","lbl","Criterios, sobre 10 puntos"));
+    c.appendChild(el("ul","t",a.crit.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")));
+    var r=el("div","row"),lab=el("label","code","Fecha y hora límite"),inp=el("input");
+    inp.type="datetime-local";inp.setAttribute("aria-label","Fecha y hora límite de la tarea "+a.n);
+    r.appendChild(lab);r.appendChild(inp);
+    var btn=el("button","copy","Copiar enunciado para el aula virtual");btn.type="button";
+    btn.addEventListener("click",function(){
+      copiar(btn,"Tarea "+a.n+". "+a.t+" ("+a.peso+" de la nota del módulo)\n\nObjetivos:\n"+a.obj.map(function(x){return "- "+x}).join("\n")+"\n\nDescripción: "+a.desc+"\n\nFormato de entrega: "+a.fmt+"\n\nCriterios (sobre 10 puntos):\n"+a.crit.map(function(x){return "- "+x}).join("\n")+"\n\nFecha y hora límite: "+fechaTxt(inp.value));
+    });
+    r.appendChild(btn);c.appendChild(r);cont.appendChild(c);
+  });
+})();
+
+/* ── TEST ── */
+(function(){
+  var cont=$("#test"),marc=$("#marcador"),resp=0,aciertos=0;
+  function render(){
+    cont.innerHTML="";resp=0;aciertos=0;actualizar();
+    TEST.forEach(function(t,i){
+      var q=el("div","q");q.appendChild(el("p","s",(i+1)+". "+esc(t.q)));
+      var opts=[];
+      t.o.forEach(function(txt,j){
+        var b=el("button","opt",esc(txt));b.type="button";opts.push(b);
+        b.addEventListener("click",function(){
+          if(q.classList.contains("done"))return;
+          q.classList.add("done");resp++;
+          opts.forEach(function(x,k){x.disabled=true;if(k===t.c)x.classList.add("ok")});
+          if(j===t.c)aciertos++;else b.classList.add("bad");
+          actualizar();
+        });
+        q.appendChild(b);
+      });
+      q.appendChild(el("div","fb",esc(t.f)));cont.appendChild(q);
+    });
+  }
+  function actualizar(){
+    marc.textContent=resp<TEST.length?resp+" de "+TEST.length+" respondidas":"Resultado: "+aciertos+" de "+TEST.length+" correctas";
+  }
+  $("#reiniciar").addEventListener("click",render);
+  render();
+  var ab=$("#abiertas");
+  ABIERTAS.forEach(function(a,i){
+    var c=el("div","q");c.appendChild(el("p","s",(i+11)+". "+esc(a.q)));
+    var ta=el("textarea");ta.setAttribute("aria-label","Su respuesta");c.appendChild(ta);
+    var m=el("div","model","<b>Respuesta modelo.</b> "+esc(a.m));
+    var r=el("div","row"),btn=el("button","copy","Ver respuesta modelo");btn.type="button";
+    btn.addEventListener("click",function(){m.classList.toggle("on")});
+    r.appendChild(btn);c.appendChild(r);c.appendChild(m);ab.appendChild(c);
+  });
+})();
+
+/* ── ENUNCIADO DE LA TAREA FINAL ── */
+document.querySelectorAll("[data-copy=final]").forEach(function(b){
+  b.addEventListener("click",function(){
+    var v=$("#fecha-final").value,f="por definir";
+    if(v){var d=new Date(v);if(!isNaN(d))f=d.toLocaleDateString("es-EC",{day:"numeric",month:"long",year:"numeric"})+", "+d.toLocaleTimeString("es-EC",{hour:"2-digit",minute:"2-digit"})}
+    copiar(b,"Tarea final. Laboratorio de prompts (70% de la nota del módulo)\n\nObjetivos:\n- Construir un prompt jurídico en Rol, Contexto, Instrucción para una tarea real de la práctica profesional.\n- Probarlo en al menos tres modelos distintos con casos normales, adversariales y con datos personales, y documentar las diferencias.\n- Iterar el prompt a partir de las fallas encontradas y justificar cada cambio.\n- Evaluar el impacto del uso del prompt en la protección de datos personales conforme a la LOPDP y definir un protocolo de uso responsable.\n\nDescripción y formato de entrega: un solo PDF de máximo catorce páginas, sin contar anexos, con estas partes:\n1. Ficha de la tarea (500 a 700 palabras): tarea real, quién la hace hoy, cuánto tarda, riesgos, qué se delega y qué no, con el criterio.\n2. Evolución del prompt: versión vaga de partida, al menos tres iteraciones y versión final en Rol, Contexto, Instrucción. Para cada iteración, qué falló y qué se cambió.\n3. Matriz de pruebas: mínimo tres modelos con tres casos cada uno (normal, adversarial y con datos personales sin anonimizar). Nueve ejecuciones con evidencia fechada, evaluadas con cinco criterios: hechos usados, formato, verificación de citas, respeto de límites y manejo de datos personales.\n4. Análisis comparativo entre modelos (dos o tres páginas): diferencias, citas inventadas, complacencia, respeto de límites y modelo elegido con las razones.\n5. Evaluación de impacto y protocolo de uso responsable (dos páginas): riesgos para los titulares, base de legitimación, medidas, secreto profesional, verificación de citas, trazabilidad y responsabilidad del abogado.\n6. Sustentación oral de diez minutos con demostración en vivo del prompt en dos modelos.\n\nCriterios de evaluación y pesos: ficha y delegación 10%, calidad del prompt e iteraciones 25%, matriz de pruebas y evidencia 25%, análisis comparativo 20%, evaluación de impacto y protocolo 10%, sustentación 10%.\n\nReglas: puede usar IA para construir el prompt y debe declararlo al inicio. Las capturas muestran fecha y modelo. Los casos van anonimizados. El trabajo no tiene componente de selección múltiple.\n\nFecha y hora límite de entrega, improrrogable: "+f);
+  });
+});
+</script>
+</body>
+</html>
