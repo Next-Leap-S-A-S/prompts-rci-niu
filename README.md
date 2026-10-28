@@ -19,6 +19,8 @@ diplomado.
   causa), versiones del prompt, matriz de nueve pruebas en tres modelos e
   informe en Markdown. El trabajo se guarda en el navegador de quien lo usa.
 
+- **Presentación** (`presentacion-modulo3.pdf`). Pitch deck de 28 láminas del módulo, con la identidad visual del diplomado. El PPTX editable no se publica.
+
 ## Cómo está construido
 
 Dos archivos HTML autocontenidos, sin peticiones externas. Se editan en `src/` y
