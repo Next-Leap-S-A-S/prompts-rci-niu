@@ -288,7 +288,7 @@ footer img{height:34px;width:auto}
 <!-- 3b. VIBECODING -->
 <section class="panel" id="p-vibe"><div class="wrap">
   <h2>Vibecoding</h2>
-  <p class="sub">Vibecoding es construir una herramienta describi&#233;ndola en lenguaje natural y dejando que la IA escriba el c&#243;digo. Usted no programa, dirige. El prompt sigue la misma l&#243;gica del m&#243;dulo: un rol que fija la experiencia de quien construye y una instrucci&#243;n que dice qu&#233; se debe poder hacer. Cada ejemplo trae el prompt completo, lo que deber&#237;a entregar la IA, las mejoras para pedir en una segunda vuelta y lo que hay que revisar antes de usarlo con un caso real.</p>
+  <p class="sub">Vibecoding es construir una herramienta describi&#233;ndola en lenguaje natural y dejando que la IA escriba el c&#243;digo. Usted no programa, dirige. El prompt sigue la misma l&#243;gica del m&#243;dulo: un rol que fija la experiencia de quien construye y una instrucci&#243;n que dice qu&#233; se debe poder hacer. Hay once ejemplos, uno por cada herramienta que un despacho suele necesitar. Cada uno trae el prompt completo, lo que deber&#237;a entregar la IA, las mejoras para pedir en una segunda vuelta y lo que hay que revisar antes de usarlo con un caso real.</p>
   <div class="grid" style="margin-bottom:8px">
     <div class="card" style="border-top:3px solid var(--rol)"><span class="lbl" style="color:var(--rol)">Rol</span><p>Un programador con experiencia en el tipo de herramienta que necesita. El rol decide qu&#233; decisiones de dise&#241;o toma la IA sin que usted se las pida.</p></div>
     <div class="card" style="border-top:3px solid var(--ins)"><span class="lbl" style="color:var(--ins)">Instrucci&#243;n</span><p>Qu&#233; se construye y qu&#233; debe poder hacer cada m&#243;dulo. Se describe en frases cortas y verificables.</p></div>
@@ -1760,6 +1760,236 @@ var VIBE = [
     "Confirme que cada evento queda asociado al proceso y al cliente correctos, y que al borrar un cliente no se pierden sus tareas sin aviso.",
     "Revise d\u00f3nde se guardan los datos. Un artifact con datos solo en el navegador no sirve para un equipo, y uno con datos reales de clientes exige cumplir la LOPDP.",
     "Un t\u00e9rmino vencido por un error de la herramienta es responsabilidad del abogado. Mantenga el control tradicional en paralelo hasta tener confianza."
+  ]
+},
+{
+  area: "T\u00e9rminos",
+  nombre: "Contador de t\u00e9rminos procesales con feriados",
+  resumen: "Una calculadora que recibe la fecha de notificaci\u00f3n y el tipo de t\u00e9rmino y devuelve la fecha de vencimiento, saltando fines de semana y feriados.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech de control de t\u00e9rminos judiciales. Conoce la diferencia entre d\u00edas calendario y d\u00edas h\u00e1biles, entre t\u00e9rminos y plazos, y sabe que un error de un d\u00eda puede costarle un recurso a un cliente.",
+  instruccion: "Va a crear un artifact que cuente t\u00e9rminos procesales.\n\nEl usuario ingresa la fecha de notificaci\u00f3n, el n\u00famero de d\u00edas y si el t\u00e9rmino corre en d\u00edas h\u00e1biles o calendario.\n\nLa herramienta devuelve la fecha de vencimiento, los d\u00edas que faltan y una lista de los d\u00edas que excluy\u00f3, con el motivo de cada uno.\n\nIncluya una lista editable de feriados para que el usuario agregue los que decreten las autoridades.\n\nPermita guardar varios t\u00e9rminos y ordenarlos por vencimiento, con los m\u00e1s urgentes en rojo.",
+  entrega: [
+    "Formulario con fecha, n\u00famero de d\u00edas y tipo de c\u00f3mputo.",
+    "Resultado con fecha de vencimiento y el detalle d\u00eda por d\u00eda de lo que se cont\u00f3 y lo que se excluy\u00f3.",
+    "Lista de feriados editable, con los de Ecuador de ejemplo.",
+    "Lista de t\u00e9rminos guardados, ordenada por urgencia."
+  ],
+  iteraciones: [
+    "\u00abAgrega un campo para el proceso y el cliente, y un filtro por cliente.\u00bb",
+    "\u00abMuestra un aviso cuando el \u00faltimo d\u00eda cae en un d\u00eda en que el despacho judicial no atiende.\u00bb",
+    "\u00abHaz que el t\u00e9rmino pueda suspenderse y reanudarse, y que la herramienta recalcule con los d\u00edas restantes.\u00bb"
+  ],
+  revisar: [
+    "Compruebe tres casos contra las reglas de c\u00f3mputo del COGEP y de la norma especial que aplique, incluyendo un t\u00e9rmino que cruce un feriado.",
+    "Verifique que los feriados cargados sean los oficiales del a\u00f1o. La IA puede inventar o omitir uno.",
+    "Defina desde cu\u00e1ndo se cuenta: el d\u00eda de la notificaci\u00f3n o el siguiente. La herramienta debe decirlo en pantalla, no dejarlo impl\u00edcito."
+  ]
+},
+{
+  area: "Honorarios",
+  nombre: "Control de horas y honorarios por cliente",
+  resumen: "Registro de tiempo por abogado, proceso y cliente, con tarifa por hora, tope pactado y borrador de cuenta de cobro.",
+  rol: "Usted es un programador con experiencia en plataformas de gesti\u00f3n de despachos, especializado en facturaci\u00f3n y control de honorarios. Entiende los esquemas de tarifa por hora, tarifa fija, cuota de \u00e9xito y retainer mensual.",
+  instruccion: "Va a crear un artifact para controlar las horas y los honorarios de un despacho.\n\nCada abogado registra tiempo con fecha, cliente, proceso, descripci\u00f3n y horas.\n\nCada cliente tiene un esquema de cobro: por hora con tarifa, fijo mensual o con tope de horas.\n\nLa herramienta muestra, por cliente, las horas del mes, el valor acumulado y cu\u00e1nto falta para llegar al tope.\n\nPermita generar un borrador de cuenta de cobro con el detalle de actividades, listo para copiar.",
+  entrega: [
+    "Formulario de registro de tiempo y lista de registros con filtros.",
+    "Panel por cliente con horas, valor acumulado y alerta al acercarse al tope.",
+    "Borrador de cuenta de cobro con el detalle de las actividades.",
+    "Datos de ejemplo de tres abogados y cinco clientes."
+  ],
+  iteraciones: [
+    "\u00abAgrega una tarifa distinta por abogado seg\u00fan su categor\u00eda.\u00bb",
+    "\u00abSepara las horas facturables de las no facturables y muestra el porcentaje de cada una.\u00bb",
+    "\u00abMu\u00e9strame los clientes rentables y los que consumen m\u00e1s horas de las pactadas.\u00bb"
+  ],
+  revisar: [
+    "Pruebe cada esquema de cobro con un caso hecho a mano y compare los totales.",
+    "Revise los impuestos y la facturaci\u00f3n. La herramienta produce un borrador interno, no un comprobante v\u00e1lido ante el SRI.",
+    "Las descripciones de actividades pueden revelar estrategia. Cuide qui\u00e9n ve qu\u00e9 antes de compartir el borrador."
+  ]
+},
+{
+  area: "Societario",
+  nombre: "Generador de actas de junta con formulario",
+  resumen: "Un formulario que recoge convocatoria, asistentes, qu\u00f3rum, orden del d\u00eda y decisiones, y arma el acta con redacci\u00f3n formal.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech para el \u00e1rea societaria. Ha construido generadores de documentos que combinan un formulario guiado con plantillas de redacci\u00f3n formal.",
+  instruccion: "Va a crear un artifact que genere actas de junta general de socios o accionistas.\n\nPrimero un formulario con la sociedad, la fecha, el lugar, el tipo de junta, los asistentes con su participaci\u00f3n, el orden del d\u00eda y las decisiones adoptadas con el resultado de cada votaci\u00f3n.\n\nLa herramienta calcula si hay qu\u00f3rum a partir de las participaciones.\n\nCon esos datos arma un acta en registro formal, con numeraci\u00f3n, y permite copiarla o imprimirla.\n\nSi falta un dato obligatorio, no genera el acta y dice cu\u00e1l falta.",
+  entrega: [
+    "Formulario por pasos con validaci\u00f3n de datos obligatorios.",
+    "C\u00e1lculo autom\u00e1tico de qu\u00f3rum y de resultado de votaciones.",
+    "Acta redactada en formato formal, lista para copiar o imprimir.",
+    "Un ejemplo completo precargado."
+  ],
+  iteraciones: [
+    "\u00abAgrega una plantilla distinta para junta ordinaria y para junta extraordinaria.\u00bb",
+    "\u00abPermite guardar las actas y numerarlas de forma consecutiva por sociedad.\u00bb",
+    "\u00abAgrega un espacio para firmas y para anexar la lista de asistencia.\u00bb"
+  ],
+  revisar: [
+    "Compare el acta con los estatutos de la sociedad. El qu\u00f3rum y las mayor\u00edas dependen de ellos y de la ley, no de lo que la IA suponga.",
+    "Revise que la redacci\u00f3n refleje lo que realmente se decidi\u00f3, sin agregar frases que nadie dijo.",
+    "Use solo sociedades ficticias hasta validar la herramienta."
+  ]
+},
+{
+  area: "Litigio",
+  nombre: "L\u00ednea de tiempo de un expediente",
+  resumen: "Una cronolog\u00eda visual de los hechos y actuaciones de un caso, con fuente documental por cada evento y filtros por parte.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech para litigio. Dise\u00f1a visualizaciones que ayudan a un abogado a entender un caso en minutos y a preparar una audiencia.",
+  instruccion: "Va a crear un artifact que muestre la l\u00ednea de tiempo de un expediente.\n\nCada evento tiene fecha, t\u00edtulo, descripci\u00f3n, parte involucrada, documento de soporte y tipo: hecho, actuaci\u00f3n procesal o t\u00e9rmino.\n\nLa l\u00ednea de tiempo se ordena por fecha, se puede filtrar por tipo y por parte, y marca en otro color los eventos que a\u00fan no tienen documento de soporte.\n\nPermita agregar, editar y borrar eventos, y exportar la cronolog\u00eda como texto.",
+  entrega: [
+    "L\u00ednea de tiempo vertical con color por tipo de evento.",
+    "Formulario para agregar y editar eventos.",
+    "Filtros por tipo y por parte, y alerta de eventos sin soporte.",
+    "Exportaci\u00f3n de la cronolog\u00eda en texto plano."
+  ],
+  iteraciones: [
+    "\u00abAgrega un campo de p\u00e1gina o folio del expediente para cada evento.\u00bb",
+    "\u00abCalcula los d\u00edas transcurridos entre un evento y el siguiente.\u00bb",
+    "\u00abAgrega una vista resumen de una p\u00e1gina para llevar a la audiencia.\u00bb"
+  ],
+  revisar: [
+    "Contraste cada evento con el documento que lo respalda. Si la IA ayud\u00f3 a armar la cronolog\u00eda desde un texto, verifique fechas y nombres uno por uno.",
+    "Los hechos no probados deben quedar marcados como tales.",
+    "Anonimice partes y n\u00fameros de causa antes de pegar texto real."
+  ]
+},
+{
+  area: "Debida diligencia",
+  nombre: "Lista de chequeo de debida diligencia societaria",
+  resumen: "Una lista de documentos y verificaciones por categor\u00eda, con estado, responsable, hallazgos y sem\u00e1foro de riesgo para una compraventa de empresa.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech para transacciones. Ha construido listas de chequeo y tableros de seguimiento para procesos de debida diligencia en compraventas de empresas.",
+  instruccion: "Va a crear un artifact para llevar una debida diligencia legal.\n\nLa lista se organiza por categor\u00edas: societario, contratos, laboral, tributario, propiedad intelectual, litigios y protecci\u00f3n de datos.\n\nCada \u00edtem tiene estado (solicitado, recibido, revisado, con hallazgo), responsable, fecha y observaciones.\n\nLos hallazgos llevan un nivel de riesgo: alto, medio o bajo.\n\nUn panel resume el avance por categor\u00eda y lista los hallazgos de riesgo alto. Permita exportar un resumen para el cliente.",
+  entrega: [
+    "Lista por categor\u00edas con estados y responsables.",
+    "Registro de hallazgos con nivel de riesgo.",
+    "Panel de avance y lista de hallazgos cr\u00edticos.",
+    "Resumen exportable en texto."
+  ],
+  iteraciones: [
+    "\u00abAgrega los \u00edtems t\u00edpicos de cada categor\u00eda para una empresa ecuatoriana de servicios.\u00bb",
+    "\u00abAgrega una columna con la fecha en que se pidi\u00f3 cada documento y marca los atrasados.\u00bb",
+    "\u00abHaz que el resumen para el cliente use un lenguaje sin tecnicismos.\u00bb"
+  ],
+  revisar: [
+    "La lista de \u00edtems es un punto de partida. Un abogado con experiencia en la operaci\u00f3n debe completarla.",
+    "Revise c\u00f3mo se clasifica cada riesgo. La IA tiende a calificar todo como medio.",
+    "Cuide la confidencialidad de la informaci\u00f3n de la empresa objetivo."
+  ]
+},
+{
+  area: "Laboral",
+  nombre: "Calculadora de liquidaci\u00f3n laboral",
+  resumen: "Calcula los rubros de una terminaci\u00f3n de contrato a partir de salario, fechas y causa, con el desglose y la f\u00f3rmula de cada uno.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech para el \u00e1rea laboral. Programa c\u00e1lculos que muestran el procedimiento junto con el resultado, para que un abogado pueda auditarlos.",
+  instruccion: "Va a crear un artifact que calcule la liquidaci\u00f3n de un trabajador.\n\nEl usuario ingresa la fecha de ingreso, la fecha de salida, el salario, la causa de terminaci\u00f3n y los valores ya pagados.\n\nLa herramienta calcula cada rubro que corresponda, muestra la f\u00f3rmula y los datos que us\u00f3, y suma el total.\n\nLos porcentajes, montos y reglas deben estar en una tabla de par\u00e1metros editable, no escritos dentro del c\u00f3digo, y cada par\u00e1metro debe indicar la norma de donde sale.\n\nSi falta un dato, pregunta antes de calcular.",
+  entrega: [
+    "Formulario de datos del trabajador y de la terminaci\u00f3n.",
+    "Desglose de rubros con f\u00f3rmula y resultado.",
+    "Tabla de par\u00e1metros editable con su fuente normativa.",
+    "Total a pagar y diferencia frente a lo ya pagado."
+  ],
+  iteraciones: [
+    "\u00abAgrega un modo comparativo entre terminaci\u00f3n por renuncia y por despido.\u00bb",
+    "\u00abMuestra una advertencia cuando el tiempo de servicio sea menor a un a\u00f1o.\u00bb",
+    "\u00abExporta el c\u00e1lculo como un documento que pueda anexar a un escrito.\u00bb"
+  ],
+  revisar: [
+    "Cada porcentaje y cada tope debe contrastarse con el C\u00f3digo del Trabajo y la norma vigente. La IA puede usar valores de otro pa\u00eds o de una reforma anterior.",
+    "Haga el c\u00e1lculo a mano en tres casos y compare.",
+    "No presente el resultado a un cliente como definitivo sin la revisi\u00f3n de un abogado laboralista."
+  ]
+},
+{
+  area: "Protecci\u00f3n de datos",
+  nombre: "Registro de actividades de tratamiento y brechas",
+  resumen: "Un inventario de tratamientos de datos personales con base de legitimaci\u00f3n, finalidad y plazos, m\u00e1s un registro de incidentes de seguridad.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech de cumplimiento en protecci\u00f3n de datos. Ha construido inventarios de tratamiento y registros de incidentes para delegados de protecci\u00f3n de datos.",
+  instruccion: "Va a crear un artifact para gestionar el cumplimiento de la LOPDP en una organizaci\u00f3n.\n\nPrimer m\u00f3dulo, un registro de actividades de tratamiento con \u00e1rea responsable, finalidad, categor\u00edas de datos, titulares, base de legitimaci\u00f3n, encargados, transferencias, plazo de conservaci\u00f3n y medidas de seguridad.\n\nSegundo m\u00f3dulo, un registro de incidentes con fecha de detecci\u00f3n, descripci\u00f3n, datos afectados, n\u00famero aproximado de titulares, medidas tomadas y estado.\n\nUn panel muestra los tratamientos sin base de legitimaci\u00f3n definida y los incidentes abiertos. Permita exportar ambos registros.",
+  entrega: [
+    "Tabla de tratamientos con formulario de alta y edici\u00f3n.",
+    "Registro de incidentes con estado.",
+    "Panel de alertas por campos incompletos.",
+    "Exportaci\u00f3n de ambos registros."
+  ],
+  iteraciones: [
+    "\u00abAgrega un recordatorio cuando un plazo de conservaci\u00f3n est\u00e9 por vencer.\u00bb",
+    "\u00abAgrega una evaluaci\u00f3n sencilla del riesgo de cada tratamiento.\u00bb",
+    "\u00abGenera un resumen del registro para presentarlo a la gerencia.\u00bb"
+  ],
+  revisar: [
+    "Los campos obligatorios y las bases de legitimaci\u00f3n deben corresponder a la LOPDP y a su reglamento. Comp\u00e1relos con el texto de la ley.",
+    "Una herramienta que guarda datos personales tambi\u00e9n es un tratamiento. Defina d\u00f3nde se almacena y qui\u00e9n accede.",
+    "No registre datos reales de titulares en las pruebas."
+  ]
+},
+{
+  area: "Contratos",
+  nombre: "Generador de contratos con preguntas guiadas",
+  resumen: "Un asistente que pregunta paso a paso los datos de un contrato de arrendamiento o de servicios y arma el texto con cl\u00e1usulas condicionales.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech de automatizaci\u00f3n documental. Dise\u00f1a formularios con l\u00f3gica condicional que producen documentos jur\u00eddicos completos y coherentes.",
+  instruccion: "Va a crear un artifact que genere un contrato de arrendamiento de local comercial.\n\nHace preguntas en pasos: partes, inmueble, uso, canon, plazo, reajuste, garant\u00eda y causales de terminaci\u00f3n.\n\nSeg\u00fan las respuestas incluye o quita cl\u00e1usulas. Por ejemplo, si hay garant\u00eda, agrega la cl\u00e1usula de garant\u00eda.\n\nAl final muestra el contrato completo, con las cl\u00e1usulas numeradas y los datos resaltados, y una lista de los datos que quedaron vac\u00edos.\n\nUse marcadores como [NOMBRE DEL ARRENDADOR] para lo que no se llen\u00f3.",
+  entrega: [
+    "Formulario por pasos con l\u00f3gica condicional.",
+    "Contrato con cl\u00e1usulas numeradas y datos resaltados.",
+    "Lista de campos pendientes.",
+    "Bot\u00f3n para copiar el texto."
+  ],
+  iteraciones: [
+    "\u00abAgrega una versi\u00f3n que proteja m\u00e1s al arrendatario y otra que proteja m\u00e1s al arrendador.\u00bb",
+    "\u00abAgrega una cl\u00e1usula opcional de renovaci\u00f3n autom\u00e1tica y explica su efecto en una l\u00ednea.\u00bb",
+    "\u00abPermite que el abogado edite el texto de cada cl\u00e1usula base.\u00bb"
+  ],
+  revisar: [
+    "Lea el contrato completo. Las cl\u00e1usulas condicionales pueden dejar referencias cruzadas rotas o numeraci\u00f3n errada.",
+    "Contraste el texto con la normativa de arrendamiento aplicable en Ecuador.",
+    "Un contrato generado es un borrador. No lo firme sin revisi\u00f3n de un abogado."
+  ]
+},
+{
+  area: "Clientes",
+  nombre: "Formulario de consulta inicial y conflicto de intereses",
+  resumen: "Un formulario de admisi\u00f3n de cliente nuevo que recoge los datos del caso y revisa contra la base de clientes si hay conflicto de intereses.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech para la admisi\u00f3n de clientes en despachos. Dise\u00f1a flujos que protegen al despacho de conflictos de intereses y de asuntos fuera de su pr\u00e1ctica.",
+  instruccion: "Va a crear un artifact para la consulta inicial de un cliente nuevo.\n\nEl formulario pide nombre o raz\u00f3n social, tipo de asunto, contraparte, resumen de los hechos, urgencia y c\u00f3mo lleg\u00f3 al despacho.\n\nLa herramienta tiene una lista de clientes y contrapartes existentes. Si el nombre de la contraparte coincide con un cliente actual o anterior, muestra una alerta de posible conflicto.\n\nAl final genera una hoja de admisi\u00f3n para que el socio decida si acepta el caso, con una recomendaci\u00f3n de a qu\u00e9 abogado asignarlo seg\u00fan el \u00e1rea.",
+  entrega: [
+    "Formulario de consulta con validaciones.",
+    "Verificaci\u00f3n de coincidencias contra una base de clientes de ejemplo.",
+    "Hoja de admisi\u00f3n lista para decisi\u00f3n.",
+    "Lista de consultas con su estado: pendiente, aceptada, rechazada."
+  ],
+  iteraciones: [
+    "\u00abHaz que la b\u00fasqueda de coincidencias tolere errores de escritura y nombres parecidos.\u00bb",
+    "\u00abAgrega un campo con el motivo del rechazo y una plantilla de carta de declinaci\u00f3n.\u00bb",
+    "\u00abAgrega seguimiento de la fecha de la \u00faltima comunicaci\u00f3n con el prospecto.\u00bb"
+  ],
+  revisar: [
+    "La coincidencia por nombre no reemplaza un an\u00e1lisis de conflicto. Decide el socio, no la herramienta.",
+    "El formulario recoge datos personales de quien consulta. Defina cu\u00e1nto tiempo se conservan y con qu\u00e9 finalidad, de acuerdo con la LOPDP.",
+    "Pruebe con nombres parecidos y con hom\u00f3nimos para ver qu\u00e9 falsas alertas produce."
+  ]
+},
+{
+  area: "Propiedad intelectual",
+  nombre: "Portafolio de marcas y vencimientos",
+  resumen: "Un tablero de las marcas de un cliente con clase, estado, fechas de registro y renovaci\u00f3n, y alertas de vencimiento.",
+  rol: "Usted es un programador con experiencia en herramientas legaltech para propiedad intelectual. Ha construido portafolios de marcas y patentes con alertas de renovaci\u00f3n y de plazos de oposici\u00f3n.",
+  instruccion: "Va a crear un artifact para administrar el portafolio de marcas de un cliente.\n\nCada marca tiene nombre, titular, clase, pa\u00eds, n\u00famero de registro, estado (solicitada, concedida, en oposici\u00f3n, vencida), fecha de solicitud, fecha de concesi\u00f3n y fecha de vencimiento.\n\nEl tablero muestra las marcas en una tabla filtrable y destaca las que vencen en los pr\u00f3ximos noventa d\u00edas.\n\nUn calendario lista las fechas de renovaci\u00f3n del a\u00f1o. Permita agregar notas por marca y exportar el portafolio.",
+  entrega: [
+    "Tabla de marcas con filtros por estado, clase y pa\u00eds.",
+    "Alertas de vencimiento pr\u00f3ximo.",
+    "Calendario anual de renovaciones.",
+    "Ficha de cada marca con notas."
+  ],
+  iteraciones: [
+    "\u00abAgrega un campo para el costo de renovaci\u00f3n y suma el presupuesto del a\u00f1o.\u00bb",
+    "\u00abAgrega una vista por titular para clientes con varias sociedades.\u00bb",
+    "\u00abGenera una carta de recordatorio de renovaci\u00f3n para el cliente.\u00bb"
+  ],
+  revisar: [
+    "Verifique las fechas y los plazos de renovaci\u00f3n contra el registro oficial de la autoridad competente. No conf\u00ede en lo que la IA suponga sobre la vigencia.",
+    "Confirme que las clases usen la clasificaci\u00f3n internacional correcta.",
+    "Mantenga una copia de respaldo del portafolio fuera del navegador."
   ]
 }
 ];
