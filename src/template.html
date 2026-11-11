@@ -281,6 +281,20 @@ footer img{height:34px;width:auto}
   <div id="lista-asistentes"></div>
 </div></section>
 
+<!-- 3b. VIBECODING -->
+<section class="panel" id="p-vibe"><div class="wrap">
+  <h2>Vibecoding</h2>
+  <p class="sub">Vibecoding es construir una herramienta describiéndola en lenguaje natural y dejando que la IA escriba el código. Usted no programa, dirige. El prompt sigue la misma lógica del módulo: un rol que fija la experiencia de quien construye y una instrucción que dice qué se debe poder hacer. Cada ejemplo trae el prompt completo, lo que debería entregar la IA, las mejoras para pedir en una segunda vuelta y lo que hay que revisar antes de usarlo con un caso real.</p>
+  <div class="grid" style="margin-bottom:8px">
+    <div class="card" style="border-top:3px solid var(--rol)"><span class="lbl" style="color:var(--rol)">Rol</span><p>Un programador con experiencia en el tipo de herramienta que necesita. El rol decide qué decisiones de diseño toma la IA sin que usted se las pida.</p></div>
+    <div class="card" style="border-top:3px solid var(--ins)"><span class="lbl" style="color:var(--ins)">Instrucción</span><p>Qué se construye y qué debe poder hacer cada módulo. Se describe en frases cortas y verificables.</p></div>
+    <div class="card" style="border-top:3px solid var(--ctx)"><span class="lbl" style="color:var(--ctx)">Iteración</span><p>La primera versión rara vez es la última. Se prueba, se anota lo que falta y se pide el cambio por partes.</p></div>
+  </div>
+  <div class="note">Use datos ficticios. Una herramienta construida con IA es un prototipo hasta que alguien con criterio jurídico y técnico la revise. Nunca cargue cédulas, números de causa ni datos reales de clientes en una primera versión.</div>
+  <h3>Ejemplos</h3>
+  <div id="lista-vibe"></div>
+</div></section>
+
 <!-- 4. TAREAS -->
 <section class="panel" id="p-act"><div class="wrap">
   <h2>Tareas semanales</h2>
@@ -471,7 +485,7 @@ function fallback(t){var a=document.createElement("textarea");a.value=t;document
 function lista(x){return Array.isArray(x)?x:(x?[x]:[])}
 
 /* ── PESTAÑAS ── */
-var TABS=[["ruta","Ruta"],["prompts","Prompts"],["herr","Herramientas"],["gpts","GPTs"],["act","Tareas"],["test","Test"],["final","Lecturas y tarea final"]];
+var TABS=[["ruta","Ruta"],["prompts","Prompts"],["herr","Herramientas"],["gpts","GPTs"],["vibe","Vibecoding"],["act","Tareas"],["test","Test"],["final","Lecturas y tarea final"]];
 (function(){
   var nav=$("#tabs");
   TABS.forEach(function(t){
@@ -538,6 +552,53 @@ window.addEventListener("hashchange",function(){ir((location.hash||"").replace("
     var r=el("div","row"),btn=el("button","copy","Copiar instrucciones");btn.type="button";
     btn.addEventListener("click",function(){copiar(btn,a.rol+"\n\n"+a.contexto+"\n\n"+a.instruccion)});
     r.appendChild(btn);b.appendChild(r);d.appendChild(b);cont.appendChild(d);
+  });
+})();
+
+/* ── VIBECODING ── */
+var VIBE = [
+{
+  area: "Gestión de despacho",
+  nombre: "Tablero de control del despacho M&M: tareas, clientes y calendario de términos",
+  resumen: "Un solo artifact que reúne lo que un despacho consulta cada mañana: quién tiene qué tarea y cuántas horas lleva, la lista de clientes y un calendario donde los términos y las audiencias dependen del proceso.",
+  rol: "Usted es un programador con experiencia en el diseño de herramientas legaltech a través de la programación. Su experiencia se ha enfocado en el desarrollo de plataformas para la gestión de despachos que permiten hacer conteo de términos, gestión de clientes y un calendario para revisar estos mismos términos, audiencias y reuniones con clientes.",
+  instruccion: "Va a crear un artifact para la gestión del despacho M&M.\n\nVa a crear un tablero de control para poder conocer qué tareas tiene asignadas cada abogado y poder asignarle más.\n\nSe debe poder conocer el estado de la tarea y cuántas horas emplea el abogado en la ejecución de esta.\n\nDebe haber un módulo de gestión de clientes.\n\nDebe haber un módulo de calendario donde, asociando procesos y clientes, se puedan contar términos y registrar eventos como audiencias.",
+  entrega: [
+    "Tablero con una columna o tarjeta por abogado, sus tareas, el estado de cada una (por ejemplo pendiente, en curso, en revisión, terminada) y el total de horas dedicadas.",
+    "Formulario para asignar una tarea nueva a un abogado, con proceso, cliente, fecha de entrega y horas estimadas.",
+    "Módulo de clientes con ficha, datos de contacto, procesos asociados y tareas abiertas.",
+    "Calendario mensual con términos y eventos. Al crear un evento se elige un proceso y un cliente, y el término se cuenta desde una fecha de inicio.",
+    "Datos de ejemplo cargados para probar todo sin escribir nada."
+  ],
+  iteraciones: [
+    "«Agrega un registro de horas por tarea: que el abogado pueda sumar tiempo con fecha y una nota breve, y que el tablero muestre el total semanal por abogado.»",
+    "«El conteo de términos debe saltar sábados, domingos y festivos de Ecuador. Muéstrame la fecha de vencimiento y cuántos días hábiles quedan, y pinta en rojo los que vencen en tres días o menos.»",
+    "«Agrega una vista de carga de trabajo que me diga quién tiene más tareas abiertas, para asignar con criterio.»",
+    "«Haz que los datos se guarden en el navegador y que pueda exportar clientes y tareas a una hoja de cálculo.»"
+  ],
+  revisar: [
+    "Cuente a mano tres términos y compárelos con los de la herramienta. Revise las reglas de cómputo del Código Orgánico General de Procesos y confirme qué días se excluyen, porque la IA puede aplicar una regla general equivocada.",
+    "Confirme que cada evento queda asociado al proceso y al cliente correctos, y que al borrar un cliente no se pierden sus tareas sin aviso.",
+    "Revise dónde se guardan los datos. Un artifact con datos solo en el navegador no sirve para un equipo, y uno con datos reales de clientes exige cumplir la LOPDP.",
+    "Un término vencido por un error de la herramienta es responsabilidad del abogado. Mantenga el control tradicional en paralelo hasta tener confianza."
+  ]
+}
+];
+(function(){
+  var cont=$("#lista-vibe");
+  VIBE.forEach(function(v){
+    var c=el("div","act");
+    c.appendChild(el("div","head",'<h3>'+esc(v.nombre)+'</h3><span class="tagarea">'+esc(v.area)+'</span>'));
+    c.appendChild(el("p","",esc(v.resumen)));
+    c.appendChild(el("div","blk rol","<b>ROL</b>"+esc(v.rol)));
+    c.appendChild(el("div","blk ins","<b>INSTRUCCIÓN</b>"+esc(v.instruccion)));
+    [["Qué debería entregar la IA",v.entrega],["Mejoras para pedir en la segunda vuelta",v.iteraciones],["Qué revisar antes de usarlo",v.revisar]].forEach(function(par){
+      c.appendChild(el("span","lbl",par[0]));
+      c.appendChild(el("ul","t",lista(par[1]).map(function(x){return "<li>"+esc(x)+"</li>"}).join("")));
+    });
+    var r=el("div","row"),btn=el("button","copy","Copiar prompt");btn.type="button";
+    btn.addEventListener("click",function(){copiar(btn,v.rol+"\n\n"+v.instruccion)});
+    r.appendChild(btn);c.appendChild(r);cont.appendChild(c);
   });
 })();
 
