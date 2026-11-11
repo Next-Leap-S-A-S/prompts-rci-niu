@@ -288,7 +288,7 @@ footer img{height:34px;width:auto}
 <!-- 3b. VIBECODING -->
 <section class="panel" id="p-vibe"><div class="wrap">
   <h2>Vibecoding</h2>
-  <p class="sub">Vibecoding es construir una herramienta describi&#233;ndola en lenguaje natural y dejando que la IA escriba el c&#243;digo. Usted no programa, dirige. El prompt sigue la misma l&#243;gica del m&#243;dulo: un rol que fija la experiencia de quien construye y una instrucci&#243;n que dice qu&#233; se debe poder hacer. Hay once ejemplos, uno por cada herramienta que un despacho suele necesitar. Cada uno trae el prompt completo, lo que deber&#237;a entregar la IA, las mejoras para pedir en una segunda vuelta y lo que hay que revisar antes de usarlo con un caso real.</p>
+  <p class="sub">Vibecoding es construir una herramienta describi&#233;ndola en lenguaje natural y dejando que la IA escriba el c&#243;digo. Usted no programa, dirige. El prompt sigue la misma l&#243;gica del m&#243;dulo: un rol que fija la experiencia de quien construye y una instrucci&#243;n que dice qu&#233; se debe poder hacer. Hay doce ejemplos, uno por cada herramienta que un despacho suele necesitar. Cada uno trae el prompt completo, lo que deber&#237;a entregar la IA, las mejoras para pedir en una segunda vuelta y lo que hay que revisar antes de usarlo con un caso real.</p>
   <div class="grid" style="margin-bottom:8px">
     <div class="card" style="border-top:3px solid var(--rol)"><span class="lbl" style="color:var(--rol)">Rol</span><p>Un programador con experiencia en el tipo de herramienta que necesita. El rol decide qu&#233; decisiones de dise&#241;o toma la IA sin que usted se las pida.</p></div>
     <div class="card" style="border-top:3px solid var(--ins)"><span class="lbl" style="color:var(--ins)">Instrucci&#243;n</span><p>Qu&#233; se construye y qu&#233; debe poder hacer cada m&#243;dulo. Se describe en frases cortas y verificables.</p></div>
@@ -1990,6 +1990,32 @@ var VIBE = [
     "Verifique las fechas y los plazos de renovaci\u00f3n contra el registro oficial de la autoridad competente. No conf\u00ede en lo que la IA suponga sobre la vigencia.",
     "Confirme que las clases usen la clasificaci\u00f3n internacional correcta.",
     "Mantenga una copia de respaldo del portafolio fuera del navegador."
+  ]
+},
+{
+  area: "Casaci\u00f3n civil",
+  nombre: "Recibo de un recurso de casaci\u00f3n y borrador del memorial de defensa (Rep\u00fablica Dominicana)",
+  resumen: "Una herramienta para la parte recurrida que recibe un recurso de casaci\u00f3n, controla el plazo para contestar y arma el memorial de defensa. Cada medio invocado por el recurrente se contrasta con la sentencia impugnada y, si no consta all\u00ed, se redacta la respuesta de que el vicio no es real.",
+  rol: "Usted es un programador con experiencia en el dise\u00f1o de herramientas legaltech para la litigaci\u00f3n ante la Suprema Corte de Justicia de la Rep\u00fablica Dominicana. Ha construido sistemas de control de plazos y generadores de escritos para despachos que trabajan en casaci\u00f3n civil. Conoce la estructura de un memorial de defensa y la diferencia entre un vicio alegado y un vicio demostrado en la sentencia.",
+  instruccion: "Va a crear un artifact para el despacho que representa a la parte recurrida en un recurso de casaci\u00f3n civil en la Rep\u00fablica Dominicana, bajo la Ley n\u00fam. 2-23 sobre el Recurso de Casaci\u00f3n.\n\nPrimero, un m\u00f3dulo de recepci\u00f3n del recurso. Se registran el n\u00famero de expediente, el recurrente, el recurrido, la sentencia impugnada con su n\u00famero y fecha, la corte que la dict\u00f3 y la fecha en que se recibi\u00f3 el acto de emplazamiento o notificaci\u00f3n del recurso.\n\nSegundo, un control de plazo. La herramienta cuenta el plazo para depositar el memorial de defensa desde la fecha de recepci\u00f3n. El plazo debe ser un par\u00e1metro editable, con un valor inicial de cinco d\u00edas, y debe indicar de d\u00f3nde sale. Muestra la fecha l\u00edmite, los d\u00edas que quedan y marca en rojo cuando faltan dos d\u00edas o menos.\n\nTercero, un m\u00f3dulo de medios. El usuario registra cada vicio o medio de casaci\u00f3n que enuncia el recurrente, por ejemplo desnaturalizaci\u00f3n de los hechos, falta de base legal o violaci\u00f3n de la ley. Para cada medio, el usuario indica si el vicio aparece o no en la sentencia impugnada y, si lo hace, copia el considerando o la p\u00e1gina de la sentencia que lo contradice. Cada medio queda en uno de estos estados: contrastado y no existe en la sentencia, existe parcialmente o pendiente de revisi\u00f3n.\n\nCuarto, un generador del borrador del memorial de defensa. Con los datos anteriores arma un escrito con estas partes: encabezado, calidad del recurrido, resumen de los hechos y del proceso, respuesta a cada medio y petitorio. En la respuesta a cada medio sostiene que el vicio enunciado no es real y que no est\u00e1 contrastado en la sentencia, y cita el considerando que el usuario indic\u00f3. El petitorio pide declarar inadmisible o rechazar el recurso.\n\nReglas: nunca invente jurisprudencia ni n\u00fameros de art\u00edculos. Donde falte una cita escriba [CITAR FUENTE VERIFICADA]. Si un medio no tiene el contraste completado, el borrador debe advertirlo y no afirmar que el vicio no existe.",
+  entrega: [
+    "Ficha de recepci\u00f3n del recurso con los datos del expediente y de la sentencia impugnada.",
+    "Contador de plazo con fecha l\u00edmite editable, d\u00edas restantes y alerta visual.",
+    "Tabla de medios del recurrente con estado de contraste y espacio para la cita de la sentencia.",
+    "Borrador del memorial de defensa con la respuesta a cada medio y el petitorio, con marcadores donde falte una fuente.",
+    "Un expediente de ejemplo ficticio cargado para probar todo."
+  ],
+  iteraciones: [
+    "\u00abAgrega una secci\u00f3n previa de medios de inadmisi\u00f3n, con espacio para argumentos sobre cuant\u00eda, forma o plazo del recurso.\u00bb",
+    "\u00abHaz que el borrador copie textualmente el considerando citado entre comillas y mantenga el n\u00famero de p\u00e1gina.\u00bb",
+    "\u00abAgrega una lista de documentos a depositar junto con el memorial y marca los que faltan.\u00bb",
+    "\u00abGenera un resumen de media p\u00e1gina del recurso y de nuestra respuesta para el cliente.\u00bb"
+  ],
+  revisar: [
+    "El plazo es lo m\u00e1s delicado. Confirme con el texto oficial de la Ley 2-23 y con los acuerdos de la Suprema Corte cu\u00e1ntos d\u00edas tiene el recurrido, si son h\u00e1biles o calendario y desde qu\u00e9 acto se cuentan. Una fuente secundaria consultada indica diez d\u00edas h\u00e1biles desde el emplazamiento, distinto de los cinco del prompt. No use la cifra de la herramienta sin ese contraste.",
+    "Lea la sentencia impugnada completa. La herramienta solo afirma que un vicio no existe si usted marc\u00f3 el contraste. Si la IA ayud\u00f3 a ubicar el considerando, verifique que la cita sea textual.",
+    "Revise cada cita de jurisprudencia y de art\u00edculos que aparezca en el borrador. Si la IA propuso alguna que usted no aport\u00f3, tr\u00e1tela como no verificada.",
+    "El memorial lo firma y lo responde el abogado. El borrador es un punto de partida y se prueba con un caso ficticio antes de usarlo con uno real."
   ]
 }
 ];
